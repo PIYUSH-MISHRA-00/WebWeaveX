@@ -39,7 +39,8 @@ class ExtractorTests(unittest.TestCase):
     self.assertIn("```", markdown)
     self.assertIn("print(\"hi\")", markdown)
 
-  def test_pipeline_preserves_headings_and_code(self):
+class ExtractorPipelineTests(unittest.IsolatedAsyncioTestCase):
+  async def test_pipeline_preserves_headings_and_code(self):
     html = """
     <html>
       <head><title>Doc</title></head>
@@ -54,7 +55,7 @@ class ExtractorTests(unittest.TestCase):
     </html>
     """
     page = PageResult(url="https://example.com", status=200, html=html)
-    processed = process(page)
+    processed = await process(page)
 
     self.assertIsNotNone(processed.markdown)
     self.assertIn("## Section", processed.markdown)

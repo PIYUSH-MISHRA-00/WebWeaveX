@@ -66,7 +66,7 @@ class SiteCrawler:
         break
       current_url, depth = next_item
       page = await self._crawler.crawl(current_url)
-      page = process_extraction(page)
+      page = await process_extraction(page)
       results.append(page)
       logger.info("Page crawled %s", current_url)
 

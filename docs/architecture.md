@@ -26,3 +26,11 @@ WebWeaveX is a monorepo designed around a clear data pipeline:
 - Deterministic outputs: stable extraction and structured formats.
 - Extensibility: plugins for strategies and extractors.
 - Scalability: distributed crawling and horizontal expansion.
+
+## Plugin System
+
+Plugins allow teams to extend extraction and post-processing without modifying core code.
+WebWeaveX scans the `plugins/` directory at runtime and registers any modules exposing
+`WebWeaveXPlugin` implementations. After core extraction runs, matching plugins can
+enrich `PageResult` objects with domain-specific metadata (for example, YouTube video
+details).
