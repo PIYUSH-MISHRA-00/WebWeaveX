@@ -20,3 +20,7 @@ class CrawlConfig:
   max_pages: int = 100
   max_depth: int = 3
   allowed_domains: list[str] | None = None
+  enable_ai_strategy: bool = False
+  strategy_keywords: list[str] = field(
+    default_factory=lambda: ["docs", "api", "guide", "reference", "tutorial"]
+  )

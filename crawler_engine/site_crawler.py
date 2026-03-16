@@ -4,6 +4,7 @@ from urllib.parse import urlparse
 
 from frontier.url_frontier import URLFrontier
 
+from ai.crawl_strategy_engine.strategy import CrawlStrategy
 from webweavex.async_crawler import AsyncCrawler
 from webweavex.async_fetcher import AsyncFetcher
 from webweavex.config import CrawlConfig
@@ -39,6 +40,7 @@ class SiteCrawler:
     self._sitemap = sitemap or SitemapDiscoverer(config)
     self._owns_sitemap = sitemap is None
     self._frontier = frontier or URLFrontier(max_depth=config.max_depth)
+    self._strategy = CrawlStrategy(config.strategy_keywords) if config.enable_ai_strategy else None
     self._crawler = AsyncCrawler(
       self._fetcher,
       config,
@@ -71,9 +73,11 @@ class SiteCrawler:
       if depth >= self._config.max_depth:
         continue
 
-      link_urls = self._extract_links(current_url, page, allowed_domains)
-      self._frontier.add_many(link_urls, depth=depth + 1)
-      logger.info("Links discovered %s", len(link_urls))
+      link_entries = self._extract_links(current_url, page, allowed_domains)
+      for link_url, priority in link_entries:
+        self._frontier.add(link_url, depth=depth + 1, priority=priority)
+        logger.info("Priority assigned %s => %s", link_url, priority)
+      logger.info("Links discovered %s", len(link_entries))
       logger.info("Frontier size %s", self._frontier.size())
 
     return results
@@ -86,12 +90,28 @@ class SiteCrawler:
     if self._owns_sitemap:
       await self._sitemap.close()
 
-  def _extract_links(self, base_url: str, page: PageResult, allowed_domains: set[str]) -> list[str]:
-    raw_links = [link.url for link in page.links]
-    resolved = [resolve_relative(base_url, link) for link in raw_links]
-    normalized = [normalize_url(link) for link in resolved]
-    filtered = self._filter_allowed(normalized, allowed_domains)
-    return deduplicate_urls(filtered)
+  def _extract_links(
+    self, base_url: str, page: PageResult, allowed_domains: set[str]
+  ) -> list[tuple[str, float]]:
+    results: list[tuple[str, float]] = []
+    for link in page.links:
+      resolved = resolve_relative(base_url, link.url)
+      normalized = normalize_url(resolved)
+      if normalized not in self._filter_allowed([normalized], allowed_domains):
+        continue
+      priority = 0.0
+      if self._strategy:
+        priority = self._strategy.score(normalized, link.text, page.text)
+      results.append((normalized, priority))
+
+    deduped = deduplicate_urls([item[0] for item in results])
+    deduped_with_priority: list[tuple[str, float]] = []
+    for url in deduped:
+      for link_url, priority in results:
+        if link_url == url:
+          deduped_with_priority.append((url, priority))
+          break
+    return deduped_with_priority
 
   def _resolve_allowed_domains(self, seed: str) -> set[str]:
     if self._config.allowed_domains:
