@@ -1,6 +1,7 @@
 ﻿from __future__ import annotations
 
 from crawler_engine.site_crawler import SiteCrawler
+from rag.rag_pipeline import build_dataset
 
 from .async_crawler import AsyncCrawler
 from .async_fetcher import AsyncFetcher
@@ -57,6 +58,13 @@ class AsyncWebWeaveX:
       return await site_crawler.crawl_site(url)
     finally:
       await site_crawler.aclose()
+
+  async def build_rag_dataset(self, url: str) -> list[dict[str, object]]:
+    logger.info("Dataset generation started for %s", url)
+    pages = await self.crawl_site(url)
+    dataset = build_dataset(pages)
+    logger.info("Dataset size %s", len(dataset))
+    return dataset
 
   async def aclose(self) -> None:
     if self._owns_fetcher:
