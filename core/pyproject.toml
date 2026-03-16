@@ -1,0 +1,23 @@
+﻿[build-system]
+requires = ["hatchling>=1.21.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "webweavex-core"
+version = "0.1.0"
+description = "Core crawling engine for WebWeaveX."
+requires-python = ">=3.11"
+license = { text = "Apache-2.0" }
+keywords = ["crawler", "web", "scraping", "rag", "knowledge-graph"]
+authors = [
+  { name = "WebWeaveX Maintainers" }
+]
+dependencies = [
+  "httpx>=0.25.0",
+  "beautifulsoup4>=4.12.0",
+  "playwright>=1.42.0",
+  "pydantic>=2.6.0"
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["webweavex"]
