@@ -7,13 +7,13 @@ DEFAULT_HEADERS: dict[str, str] = {
 
 @dataclass(frozen=True)
 class CrawlConfig:
-  """Configuration for crawling and fetching.
-
-  enable_js is reserved for future Playwright rendering support.
-  """
+  """Configuration for crawling and fetching."""
 
   timeout: float = 10.0
   headers: dict[str, str] = field(default_factory=lambda: DEFAULT_HEADERS.copy())
   retries: int = 2
   enable_js: bool = False
+  js_wait_time: float = 2.0
+  js_wait_for_selector: str | None = None
+  js_headless: bool = True
   max_concurrency: int = 10
