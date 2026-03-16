@@ -1,5 +1,7 @@
 ﻿from __future__ import annotations
 
+from crawler_engine.site_crawler import SiteCrawler
+
 from .async_crawler import AsyncCrawler
 from .async_fetcher import AsyncFetcher
 from .config import CrawlConfig
@@ -42,6 +44,19 @@ class AsyncWebWeaveX:
   async def crawl_many(self, urls: list[str]) -> list[PageResult]:
     logger.info("Async engine crawl_many requested for %s urls", len(urls))
     return await self._crawler.crawl_many(urls)
+
+  async def crawl_site(self, url: str) -> list[PageResult]:
+    logger.info("Async engine site crawl requested for %s", url)
+    site_crawler = SiteCrawler(
+      self.config,
+      fetcher=self.fetcher,
+      robots=self.robots,
+      renderer=self.renderer,
+    )
+    try:
+      return await site_crawler.crawl_site(url)
+    finally:
+      await site_crawler.aclose()
 
   async def aclose(self) -> None:
     if self._owns_fetcher:

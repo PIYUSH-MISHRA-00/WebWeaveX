@@ -17,3 +17,6 @@ class CrawlConfig:
   js_wait_for_selector: str | None = None
   js_headless: bool = True
   max_concurrency: int = 10
+  max_pages: int = 100
+  max_depth: int = 3
+  allowed_domains: list[str] | None = None
