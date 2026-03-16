@@ -64,3 +64,11 @@ htmlcov/
 # Misc
 *.tmp
 *.swp
+
+# Runtime artifacts
+rag_dataset.jsonl
+knowledge_graph.graphml
+repo_dataset.jsonl
+repo_graph.graphml
+repo_summary.md
+.tmp_site/

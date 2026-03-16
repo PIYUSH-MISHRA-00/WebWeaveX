@@ -16,6 +16,8 @@ def _strip_boilerplate(soup: BeautifulSoup) -> None:
     tag.decompose()
 
   for tag in soup.find_all(True):
+    if not isinstance(tag, Tag) or not hasattr(tag, "get") or tag.attrs is None:
+      continue
     class_id = " ".join(filter(None, [tag.get("class")[0] if tag.get("class") else "", tag.get("id") or ""]))
     lowered = class_id.lower()
     if any(key in lowered for key in ["nav", "menu", "sidebar", "footer", "header", "breadcrumb"]):

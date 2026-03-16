@@ -3,8 +3,16 @@ from __future__ import annotations
 import argparse
 import asyncio
 import json
+import sys
 from pathlib import Path
 from urllib.parse import urlparse
+
+ROOT = Path(__file__).resolve().parents[1]
+CORE_DIR = ROOT / "core"
+if str(CORE_DIR) not in sys.path:
+  sys.path.insert(0, str(CORE_DIR))
+if str(ROOT) not in sys.path:
+  sys.path.insert(0, str(ROOT))
 
 from webweavex.config import CrawlConfig
 from webweavex.logging import get_logger
