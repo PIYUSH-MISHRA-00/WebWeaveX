@@ -33,7 +33,7 @@ class Worker:
       if not url:
         continue
       page = await self._engine.crawl(url)
-      page = process_extraction(page)
+      page = await process_extraction(page)
       logger.info("URL crawled %s", url)
 
       links = [
