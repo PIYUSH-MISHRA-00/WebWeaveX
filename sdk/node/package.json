@@ -1,0 +1,22 @@
+{
+  "name": "webweavex",
+  "version": "0.1.0",
+  "description": "WebWeaveX SDK for Node.js",
+  "main": "index.js",
+  "type": "commonjs",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/PIYUSH-MISHRA-00/WebWeaveX"
+  },
+  "keywords": [
+    "webweavex",
+    "crawler",
+    "rag",
+    "knowledge-graph",
+    "sdk"
+  ],
+  "engines": {
+    "node": ">=18"
+  }
+}

@@ -3,9 +3,9 @@ requires = ["hatchling>=1.21.0"]
 build-backend = "hatchling.build"
 
 [project]
-name = "webweavex-core"
+name = "webweavex"
 version = "0.1.0"
-description = "Core crawling engine for WebWeaveX."
+description = "AI-native web crawling platform"
 requires-python = ">=3.11"
 license = { text = "Apache-2.0" }
 keywords = ["crawler", "web", "scraping", "rag", "knowledge-graph"]
@@ -23,6 +23,9 @@ dependencies = [
   "spacy>=3.7.0",
   "redis>=5.0"
 ]
+
+[project.scripts]
+webweavex = "cli.webweavex:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["webweavex"]

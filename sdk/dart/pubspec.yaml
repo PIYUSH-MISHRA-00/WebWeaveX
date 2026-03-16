@@ -1,0 +1,9 @@
+name: webweavex
+description: WebWeaveX SDK for Dart and Flutter.
+version: 0.1.0
+homepage: https://piyush-mishra-00.github.io/WebWeaveX
+repository: https://github.com/PIYUSH-MISHRA-00/WebWeaveX
+environment:
+  sdk: ">=2.19.0 <4.0.0"
+dependencies:
+  http: ^1.2.0
