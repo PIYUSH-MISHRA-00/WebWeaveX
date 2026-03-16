@@ -17,3 +17,5 @@ class PageResult(BaseModel):
   html: str | None = None
   links: list[Link] = Field(default_factory=list)
   metadata: Metadata = Field(default_factory=Metadata)
+  markdown: str | None = None
+  text: str | None = None

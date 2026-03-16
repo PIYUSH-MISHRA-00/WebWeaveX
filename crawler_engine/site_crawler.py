@@ -13,6 +13,7 @@ from webweavex.models import PageResult
 from webweavex.robots import RobotsHandler
 from webweavex.sitemap import SitemapDiscoverer
 from webweavex.url_utils import deduplicate_urls, normalize_url, resolve_relative
+from extractor.extraction_pipeline import process as process_extraction
 
 logger = get_logger(__name__)
 
@@ -63,6 +64,7 @@ class SiteCrawler:
         break
       current_url, depth = next_item
       page = await self._crawler.crawl(current_url)
+      page = process_extraction(page)
       results.append(page)
       logger.info("Page crawled %s", current_url)
 
