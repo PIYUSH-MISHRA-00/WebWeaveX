@@ -46,4 +46,9 @@ webweavex research "open-source vector databases"
 
 ## Status
 
-Phase 0 is complete: repository initialized with the monorepo structure. Implementation proceeds in incremental phases with full testing and documentation.
+Phase 1 is complete: the core Python package scaffold is in place. Implementation proceeds in incremental phases with full testing and documentation.
+
+### Core Engine Status
+
+- Phase 1 completed with a minimal crawler skeleton and packaging layout.
+- The async engine interface is prepared and will be implemented in Phase 2.

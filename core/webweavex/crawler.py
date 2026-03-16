@@ -5,8 +5,10 @@ from bs4 import BeautifulSoup
 from .config import CrawlConfig
 from .exceptions import ParseError
 from .fetcher import HttpFetcher
+from .logging import get_logger
 from .models import Link, Metadata, PageResult
 
+logger = get_logger(__name__)
 
 def parse_html(html: str | None) -> tuple[list[Link], Metadata]:
   if not html:
@@ -36,6 +38,7 @@ def parse_html(html: str | None) -> tuple[list[Link], Metadata]:
     text = tag.get_text(strip=True) or None
     links.append(Link(url=href, text=text))
 
+  logger.debug("Extracted %s links", len(links))
   return links, Metadata(title=title, meta=meta)
 
 
@@ -47,6 +50,7 @@ class Crawler:
     self._config = config
 
   def crawl(self, url: str) -> PageResult:
+    logger.info("Crawling %s", url)
     status, html = self._fetcher.fetch(url)
     links, metadata = parse_html(html)
     return PageResult(url=url, status=status, html=html, links=links, metadata=metadata)

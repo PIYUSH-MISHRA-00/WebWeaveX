@@ -3,8 +3,10 @@
 from .config import CrawlConfig
 from .crawler import Crawler
 from .fetcher import HttpFetcher
+from .logging import get_logger
 from .models import PageResult
 
+logger = get_logger(__name__)
 
 class WebWeaveX:
   """Public entry point for the core engine."""
@@ -13,7 +15,9 @@ class WebWeaveX:
     self.config = config or CrawlConfig()
     self.fetcher = fetcher or HttpFetcher(self.config)
     self._crawler = Crawler(self.fetcher, self.config)
+    logger.debug("WebWeaveX engine initialized")
 
   def crawl(self, url: str) -> PageResult:
     """Fetch and parse a single URL."""
+    logger.info("Engine crawl requested for %s", url)
     return self._crawler.crawl(url)

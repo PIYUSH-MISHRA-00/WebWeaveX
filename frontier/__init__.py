@@ -1,0 +1,1 @@
+﻿"""URL frontier module."""

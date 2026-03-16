@@ -4,6 +4,9 @@ import httpx
 
 from .config import CrawlConfig
 from .exceptions import FetchError
+from .logging import get_logger
+
+logger = get_logger(__name__)
 
 
 class HttpFetcher:
@@ -21,11 +24,13 @@ class HttpFetcher:
   def fetch(self, url: str) -> tuple[int, str]:
     last_exc: Exception | None = None
     attempts = max(self._config.retries, 0) + 1
-    for _ in range(attempts):
+    for attempt in range(1, attempts + 1):
       try:
+        logger.info("Fetching %s", url)
         response = self._client.get(url)
         return response.status_code, response.text
       except httpx.HTTPError as exc:
+        logger.warning("Fetch attempt %s failed for %s: %s", attempt, url, exc)
         last_exc = exc
     raise FetchError(f"Failed to fetch {url}") from last_exc
 
