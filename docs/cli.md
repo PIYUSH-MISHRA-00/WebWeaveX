@@ -8,6 +8,7 @@ The WebWeaveX CLI provides a simple entry point for crawling, RAG preparation, a
 - `webweavex crawl-site <url>`
 - `webweavex rag <url>`
 - `webweavex graph <url>`
+- `webweavex repo <github-url>`
 - `webweavex plugins list`
 - `webweavex worker`
 - `webweavex server`
@@ -35,6 +36,10 @@ webweavex graph https://example.com
 ```
 
 ```bash
+webweavex repo https://github.com/user/repo
+```
+
+```bash
 webweavex plugins list
 ```
 
@@ -52,6 +57,7 @@ webweavex server
 - `webweavex crawl-site` prints the number of pages crawled.
 - `webweavex rag` writes `rag_dataset.jsonl`.
 - `webweavex graph` writes `knowledge_graph.graphml`.
+- `webweavex repo` writes `repo_dataset.jsonl`, `repo_graph.graphml`, and `repo_summary.md`.
 
 ## Output Philosophy
 

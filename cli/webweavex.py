@@ -4,9 +4,11 @@ import argparse
 import asyncio
 import json
 from pathlib import Path
+from urllib.parse import urlparse
 
 from webweavex.config import CrawlConfig
 from webweavex.logging import get_logger
+from webweavex.models import PageResult
 
 from distributed.worker.worker import Worker
 from webweavex.async_engine import AsyncWebWeaveX
@@ -46,6 +48,9 @@ def _build_parser() -> argparse.ArgumentParser:
   plugins_list_parser = plugins_subparsers.add_parser("list", help="List available plugins")
   plugins_list_parser.add_argument("--registry", default="plugins/registry/registry.json")
 
+  repo_parser = subparsers.add_parser("repo", help="Analyze a GitHub repository")
+  repo_parser.add_argument("url")
+
   return parser
 
 
@@ -79,6 +84,32 @@ async def _run_graph(url: str, output: str) -> None:
   print(f"Knowledge graph saved to {output}")
 
 
+async def _run_repo(url: str) -> None:
+  from knowledge_graph.exporter import export_graphml
+  from knowledge_graph.graph_pipeline import build_graph
+  from rag.dataset_builder.exporter import export_jsonl
+  from rag.rag_pipeline import build_dataset
+
+  parsed = urlparse(url)
+  allowed_domain = parsed.netloc or "github.com"
+  config = CrawlConfig(max_pages=25, max_depth=2, allowed_domains=[allowed_domain])
+
+  async with AsyncWebWeaveX(config) as engine:
+    pages = await engine.crawl_site(url)
+
+  dataset = build_dataset(pages)
+  graph = build_graph(pages)
+
+  export_jsonl(dataset, Path("repo_dataset.jsonl"))
+  export_graphml(graph, Path("repo_graph.graphml"))
+
+  summary_text = _build_repo_summary(url, pages)
+  Path("repo_summary.md").write_text(summary_text, encoding="utf-8")
+
+  print("Repository analysis complete")
+  print("Generated repo_dataset.jsonl, repo_graph.graphml, repo_summary.md")
+
+
 def _run_plugins_list(registry_path: str) -> None:
   path = Path(registry_path)
   if not path.exists():
@@ -98,6 +129,50 @@ def _run_plugins_list(registry_path: str) -> None:
     author = plugin.get("author", "unknown")
     version = plugin.get("version", "unknown")
     print(f"- {name} ({version}) by {author} - {description}")
+
+
+def _build_repo_summary(url: str, pages: list[PageResult]) -> str:
+  lines = [
+    "# Repository Summary",
+    "",
+    f"- URL: {url}",
+    f"- Pages crawled: {len(pages)}",
+    "",
+  ]
+
+  readme_page = _select_readme_page(pages, url)
+  if readme_page:
+    content = readme_page.markdown or readme_page.text or ""
+    content = _truncate_text(content.strip())
+    lines.append("## README")
+    lines.append("")
+    lines.append(content)
+  else:
+    lines.append("## README")
+    lines.append("")
+    lines.append("README content not found in crawled pages.")
+
+  return "\n".join(lines).strip() + "\n"
+
+
+def _select_readme_page(pages: list[PageResult], base_url: str):
+  base = base_url.rstrip("/").lower()
+  for page in pages:
+    if "readme" in page.url.lower():
+      return page
+  for page in pages:
+    if page.url.rstrip("/").lower() == base:
+      return page
+  return pages[0] if pages else None
+
+
+def _truncate_text(text: str, limit: int = 4000) -> str:
+  if len(text) <= limit:
+    return text
+  trimmed = text[:limit]
+  if "\n" in trimmed:
+    trimmed = trimmed.rsplit("\n", 1)[0]
+  return trimmed + "\n\n... (truncated)"
 
 
 def main() -> None:
@@ -136,6 +211,9 @@ def main() -> None:
   elif args.command == "plugins":
     if args.plugins_command == "list":
       _run_plugins_list(args.registry)
+
+  elif args.command == "repo":
+    asyncio.run(_run_repo(args.url))
 
 
 if __name__ == "__main__":
