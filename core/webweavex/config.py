@@ -10,8 +10,15 @@ class CrawlConfig:
   """Configuration for crawling and fetching."""
 
   timeout: float = 10.0
+  connect_timeout: float | None = None
+  read_timeout: float | None = None
+  write_timeout: float | None = None
+  pool_timeout: float | None = None
   headers: dict[str, str] = field(default_factory=lambda: DEFAULT_HEADERS.copy())
   retries: int = 2
+  retry_backoff_base: float = 0.5
+  retry_backoff_max: float = 8.0
+  rate_limit_per_second: float = 5.0
   enable_js: bool = False
   js_wait_time: float = 2.0
   js_wait_for_selector: str | None = None

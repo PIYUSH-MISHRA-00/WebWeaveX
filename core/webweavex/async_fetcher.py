@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 import asyncio
 
@@ -7,6 +7,7 @@ import httpx
 from .config import CrawlConfig
 from .exceptions import FetchError
 from .logging import get_logger
+from .rate_limiter import RateLimiter
 
 logger = get_logger(__name__)
 
@@ -16,8 +17,16 @@ class AsyncFetcher:
 
   def __init__(self, config: CrawlConfig, client: httpx.AsyncClient | None = None) -> None:
     self._config = config
+    self._rate_limiter = RateLimiter(config.rate_limit_per_second)
+    timeout = httpx.Timeout(
+      config.timeout,
+      connect=config.connect_timeout,
+      read=config.read_timeout,
+      write=config.write_timeout,
+      pool=config.pool_timeout,
+    )
     self._client = client or httpx.AsyncClient(
-      timeout=config.timeout,
+      timeout=timeout,
       headers=config.headers,
       follow_redirects=True,
     )
@@ -26,10 +35,11 @@ class AsyncFetcher:
   async def fetch(self, url: str) -> tuple[int, str]:
     last_exc: Exception | None = None
     attempts = max(self._config.retries, 0) + 1
-    backoff = 0.5
+    backoff = self._config.retry_backoff_base
 
     for attempt in range(1, attempts + 1):
       try:
+        await self._rate_limiter.acquire_async()
         logger.info("Async fetching %s", url)
         response = await self._client.get(url)
         return response.status_code, response.text
@@ -37,7 +47,8 @@ class AsyncFetcher:
         last_exc = exc
         logger.warning("Async fetch attempt %s failed for %s: %s", attempt, url, exc)
         if attempt < attempts:
-          await asyncio.sleep(backoff)
+          sleep_for = min(backoff, self._config.retry_backoff_max)
+          await asyncio.sleep(sleep_for)
           backoff *= 2
 
     raise FetchError(f"Failed to fetch {url}") from last_exc
