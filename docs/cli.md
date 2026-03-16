@@ -1,12 +1,48 @@
-﻿# CLI
+# CLI
 
-The WebWeaveX CLI provides a simple entry point for crawling, RAG preparation, and research workflows.
+The WebWeaveX CLI provides a simple entry point for crawling, RAG preparation, and knowledge graph workflows.
 
-## Planned Commands
+## Commands
 
 - `webweavex crawl <url>`
+- `webweavex crawl-site <url>`
 - `webweavex rag <url>`
-- `webweavex research <topic>`
+- `webweavex graph <url>`
+- `webweavex worker`
+- `webweavex server`
+
+## Examples
+
+```bash
+webweavex crawl https://example.com
+```
+
+```bash
+webweavex crawl-site https://example.com
+```
+
+```bash
+webweavex rag https://example.com
+```
+
+```bash
+webweavex graph https://example.com
+```
+
+```bash
+webweavex worker
+```
+
+```bash
+webweavex server
+```
+
+## Outputs
+
+- `webweavex crawl` prints JSON to stdout.
+- `webweavex crawl-site` prints the number of pages crawled.
+- `webweavex rag` writes `rag_dataset.jsonl`.
+- `webweavex graph` writes `knowledge_graph.graphml`.
 
 ## Output Philosophy
 

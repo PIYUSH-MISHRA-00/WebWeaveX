@@ -2,11 +2,14 @@
 
 import argparse
 import asyncio
+import json
+from pathlib import Path
 
 from webweavex.config import CrawlConfig
 from webweavex.logging import get_logger
 
 from distributed.worker.worker import Worker
+from webweavex.async_engine import AsyncWebWeaveX
 
 logger = get_logger(__name__)
 
@@ -24,7 +27,51 @@ def _build_parser() -> argparse.ArgumentParser:
   server_parser.add_argument("--host", default="0.0.0.0")
   server_parser.add_argument("--port", type=int, default=8000)
 
+  crawl_parser = subparsers.add_parser("crawl", help="Crawl a single page")
+  crawl_parser.add_argument("url")
+
+  crawl_site_parser = subparsers.add_parser("crawl-site", help="Crawl an entire site")
+  crawl_site_parser.add_argument("url")
+
+  rag_parser = subparsers.add_parser("rag", help="Build a RAG dataset from a site")
+  rag_parser.add_argument("url")
+  rag_parser.add_argument("--output", default="rag_dataset.jsonl")
+
+  graph_parser = subparsers.add_parser("graph", help="Build a knowledge graph from a site")
+  graph_parser.add_argument("url")
+  graph_parser.add_argument("--output", default="knowledge_graph.graphml")
+
   return parser
+
+
+async def _run_crawl(url: str) -> None:
+  async with AsyncWebWeaveX() as engine:
+    result = await engine.crawl(url)
+  print(json.dumps(result.model_dump(), indent=2))
+
+
+async def _run_crawl_site(url: str) -> None:
+  async with AsyncWebWeaveX() as engine:
+    pages = await engine.crawl_site(url)
+  print(f"Pages crawled: {len(pages)}")
+
+
+async def _run_rag(url: str, output: str) -> None:
+  from rag.dataset_builder.exporter import export_jsonl
+
+  async with AsyncWebWeaveX() as engine:
+    dataset = await engine.build_rag_dataset(url)
+  export_jsonl(dataset, Path(output))
+  print(f"RAG dataset saved to {output}")
+
+
+async def _run_graph(url: str, output: str) -> None:
+  from knowledge_graph.exporter import export_graphml
+
+  async with AsyncWebWeaveX() as engine:
+    graph = await engine.build_knowledge_graph(url)
+  export_graphml(graph, Path(output))
+  print(f"Knowledge graph saved to {output}")
 
 
 def main() -> None:
@@ -47,6 +94,18 @@ def main() -> None:
 
     logger.info("Starting API server on %s:%s", args.host, args.port)
     uvicorn.run(app, host=args.host, port=args.port, log_level="info")
+
+  elif args.command == "crawl":
+    asyncio.run(_run_crawl(args.url))
+
+  elif args.command == "crawl-site":
+    asyncio.run(_run_crawl_site(args.url))
+
+  elif args.command == "rag":
+    asyncio.run(_run_rag(args.url, args.output))
+
+  elif args.command == "graph":
+    asyncio.run(_run_graph(args.url, args.output))
 
 
 if __name__ == "__main__":
