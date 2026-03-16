@@ -1,0 +1,10 @@
+{
+  "plugins": [
+    {
+      "name": "youtube",
+      "description": "Extract YouTube metadata",
+      "author": "WebWeaveX",
+      "version": "1.0.0"
+    }
+  ]
+}

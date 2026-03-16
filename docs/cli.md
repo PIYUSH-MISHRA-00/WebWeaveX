@@ -8,6 +8,7 @@ The WebWeaveX CLI provides a simple entry point for crawling, RAG preparation, a
 - `webweavex crawl-site <url>`
 - `webweavex rag <url>`
 - `webweavex graph <url>`
+- `webweavex plugins list`
 - `webweavex worker`
 - `webweavex server`
 
@@ -31,6 +32,10 @@ webweavex rag https://example.com
 
 ```bash
 webweavex graph https://example.com
+```
+
+```bash
+webweavex plugins list
 ```
 
 ```bash

@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 import argparse
 import asyncio
@@ -41,6 +41,11 @@ def _build_parser() -> argparse.ArgumentParser:
   graph_parser.add_argument("url")
   graph_parser.add_argument("--output", default="knowledge_graph.graphml")
 
+  plugins_parser = subparsers.add_parser("plugins", help="Manage plugin registry")
+  plugins_subparsers = plugins_parser.add_subparsers(dest="plugins_command", required=True)
+  plugins_list_parser = plugins_subparsers.add_parser("list", help="List available plugins")
+  plugins_list_parser.add_argument("--registry", default="plugins/registry/registry.json")
+
   return parser
 
 
@@ -72,6 +77,27 @@ async def _run_graph(url: str, output: str) -> None:
     graph = await engine.build_knowledge_graph(url)
   export_graphml(graph, Path(output))
   print(f"Knowledge graph saved to {output}")
+
+
+def _run_plugins_list(registry_path: str) -> None:
+  path = Path(registry_path)
+  if not path.exists():
+    print(f"Plugin registry not found at {registry_path}")
+    return
+
+  data = json.loads(path.read_text(encoding="utf-8"))
+  plugins = data.get("plugins", [])
+  if not plugins:
+    print("No plugins registered")
+    return
+
+  print("Available plugins:")
+  for plugin in plugins:
+    name = plugin.get("name", "unknown")
+    description = plugin.get("description", "")
+    author = plugin.get("author", "unknown")
+    version = plugin.get("version", "unknown")
+    print(f"- {name} ({version}) by {author} - {description}")
 
 
 def main() -> None:
@@ -106,6 +132,10 @@ def main() -> None:
 
   elif args.command == "graph":
     asyncio.run(_run_graph(args.url, args.output))
+
+  elif args.command == "plugins":
+    if args.plugins_command == "list":
+      _run_plugins_list(args.registry)
 
 
 if __name__ == "__main__":
