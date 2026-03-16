@@ -1,6 +1,7 @@
 ﻿from __future__ import annotations
 
 from crawler_engine.site_crawler import SiteCrawler
+from knowledge_graph.graph_pipeline import build_graph
 from rag.rag_pipeline import build_dataset
 
 from .async_crawler import AsyncCrawler
@@ -65,6 +66,13 @@ class AsyncWebWeaveX:
     dataset = build_dataset(pages)
     logger.info("Dataset size %s", len(dataset))
     return dataset
+
+  async def build_knowledge_graph(self, url: str) -> dict[str, list[dict[str, str]]]:
+    logger.info("Knowledge graph generation started for %s", url)
+    pages = await self.crawl_site(url)
+    graph = build_graph(pages)
+    logger.info("Knowledge graph nodes %s edges %s", len(graph.get("nodes", [])), len(graph.get("edges", [])))
+    return graph
 
   async def aclose(self) -> None:
     if self._owns_fetcher:

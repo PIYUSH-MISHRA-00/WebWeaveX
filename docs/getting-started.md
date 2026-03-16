@@ -7,6 +7,7 @@ WebWeaveX is under active development. The repository currently provides the pro
 - Git
 - Python 3.11+
 - Node.js 18+ (for Playwright and website tooling)
+- spaCy model for knowledge graph extraction: `python -m spacy download en_core_web_sm`
 
 ## Repository Setup
 
