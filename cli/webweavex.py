@@ -20,6 +20,10 @@ def _build_parser() -> argparse.ArgumentParser:
   worker_parser.add_argument("--redis-host", default="localhost")
   worker_parser.add_argument("--redis-port", type=int, default=6379)
 
+  server_parser = subparsers.add_parser("server", help="Start the WebWeaveX API server")
+  server_parser.add_argument("--host", default="0.0.0.0")
+  server_parser.add_argument("--port", type=int, default=8000)
+
   return parser
 
 
@@ -36,6 +40,13 @@ def main() -> None:
     worker = Worker(config)
     logger.info("Starting worker %s", config.worker_id)
     asyncio.run(worker.run())
+
+  elif args.command == "server":
+    from webweavex.api_server import app
+    import uvicorn
+
+    logger.info("Starting API server on %s:%s", args.host, args.port)
+    uvicorn.run(app, host=args.host, port=args.port, log_level="info")
 
 
 if __name__ == "__main__":
