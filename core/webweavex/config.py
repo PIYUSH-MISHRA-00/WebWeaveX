@@ -24,3 +24,6 @@ class CrawlConfig:
   strategy_keywords: list[str] = field(
     default_factory=lambda: ["docs", "api", "guide", "reference", "tutorial"]
   )
+  worker_id: str = "worker-1"
+  redis_host: str = "localhost"
+  redis_port: int = 6379
