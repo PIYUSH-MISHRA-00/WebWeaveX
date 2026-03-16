@@ -16,3 +16,4 @@ class CrawlConfig:
   headers: dict[str, str] = field(default_factory=lambda: DEFAULT_HEADERS.copy())
   retries: int = 2
   enable_js: bool = False
+  max_concurrency: int = 10
