@@ -14,6 +14,10 @@ The WebWeaveX CLI provides a simple entry point for crawling, RAG preparation, a
 ## Examples
 
 ```bash
+webweavex --help
+```
+
+```bash
 webweavex crawl https://example.com
 ```
 

@@ -1,4 +1,4 @@
-﻿:root {
+:root {
   --ifm-color-primary: #0b4f6c;
   --ifm-color-primary-dark: #094359;
   --ifm-color-primary-darker: #08394d;
@@ -6,9 +6,133 @@
   --ifm-color-primary-light: #0e5c7f;
   --ifm-color-primary-lighter: #0f628a;
   --ifm-color-primary-lightest: #1373a2;
+  --wx-ink: #0b1f2a;
+  --wx-muted: #4f6877;
+  --wx-panel: #f1f6f8;
+  --wx-border: #d4e0e6;
 }
 
-main {
-  max-width: 960px;
+.homepage {
+  max-width: 1100px;
   margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+}
+
+.hero {
+  display: flex;
+  gap: 2rem;
+  align-items: stretch;
+  border: 1px solid var(--wx-border);
+  border-radius: 18px;
+  padding: 2.5rem;
+  background: linear-gradient(135deg, #f7fbfd, #eef4f7);
+}
+
+.hero-content {
+  flex: 1.2;
+}
+
+.hero-eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.75rem;
+  color: var(--wx-muted);
+  margin-bottom: 0.75rem;
+}
+
+.hero-subtitle {
+  font-size: 1.1rem;
+  color: var(--wx-muted);
+  max-width: 32rem;
+}
+
+.hero-actions {
+  margin-top: 1.5rem;
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.hero-panel {
+  flex: 0.8;
+  background: white;
+  border-radius: 14px;
+  border: 1px solid var(--wx-border);
+  padding: 1.5rem;
+  box-shadow: 0 12px 24px rgba(7, 26, 36, 0.08);
+}
+
+.hero-panel ul {
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
+.panel-title {
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: var(--wx-ink);
+}
+
+.section {
+  margin-top: 3rem;
+}
+
+.section h2 {
+  margin-bottom: 0.75rem;
+  color: var(--wx-ink);
+}
+
+.features {
+  margin-top: 3.5rem;
+}
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.2rem;
+}
+
+.feature-card {
+  border: 1px solid var(--wx-border);
+  border-radius: 14px;
+  padding: 1.25rem;
+  background: white;
+}
+
+.feature-card h3 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  color: var(--wx-ink);
+}
+
+.callout {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 2rem;
+  border-radius: 16px;
+  background: #0b4f6c;
+  color: white;
+}
+
+.callout h2 {
+  color: white;
+  margin-bottom: 0.5rem;
+}
+
+.callout .button {
+  background: white;
+  color: #0b4f6c;
+}
+
+@media (max-width: 900px) {
+  .hero {
+    flex-direction: column;
+  }
+
+  .callout {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
