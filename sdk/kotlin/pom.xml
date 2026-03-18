@@ -19,10 +19,9 @@
   </licenses>
   
   <properties>
-    <maven.compiler.source>11</maven.compiler.source>
-    <maven.compiler.target>11</maven.compiler.target>
+    <maven.compiler.release>11</maven.compiler.release>
     <kotlin.version>1.9.10</kotlin.version>
-    <ktor.version>2.3.4</ktor.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
   
   <dependencies>
@@ -32,21 +31,11 @@
       <version>${kotlin.version}</version>
     </dependency>
     
-    <dependency>
-      <groupId>io.ktor</groupId>
-      <artifactId>ktor-client-core</artifactId>
-      <version>${ktor.version}</version>
-    </dependency>
-    
-    <dependency>
-      <groupId>io.ktor</groupId>
-      <artifactId>ktor-client-cio</artifactId>
-      <version>${ktor.version}</version>
-    </dependency>
   </dependencies>
   
   <build>
     <sourceDirectory>src/main/kotlin</sourceDirectory>
+    <testSourceDirectory>src/test/kotlin</testSourceDirectory>
     <plugins>
       <plugin>
         <groupId>org.jetbrains.kotlin</groupId>
@@ -58,6 +47,13 @@
             <phase>compile</phase>
             <goals>
               <goal>compile</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>test-compile</id>
+            <phase>test-compile</phase>
+            <goals>
+              <goal>test-compile</goal>
             </goals>
           </execution>
         </executions>

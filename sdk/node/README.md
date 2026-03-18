@@ -1,19 +1,55 @@
-﻿# WebWeaveX node SDK
+# WebWeaveX Node SDK
 
 ## Installation
-Refer to package manager for node.
+```bash
+npm install webweavex
+```
 
-## Usage
-Basic usage instructions for the node SDK.
+## Quick Start
+```js
+const { WebWeaveXClient } = require("webweavex");
 
-## Examples
-See examples/ directory.
+async function run() {
+  const client = new WebWeaveXClient("http://127.0.0.1:8001");
+  const result = await client.crawl("https://example.com");
+  console.log(result.status);
+}
+
+run();
+```
+
+## Usage Examples
+```js
+const client = new WebWeaveXClient("http://127.0.0.1:8001");
+const page = await client.crawl("https://example.com");
+const dataset = await client.ragDataset("https://example.com");
+const graph = await client.knowledgeGraph("https://example.com");
+```
 
 ## API Reference
-The main entrypoint is WebWeaveXClient.
+`new WebWeaveXClient(baseUrl)`
+
+`crawl(url)`
+
+`crawlSite(url)`
+
+`ragDataset(url)`
+
+`knowledgeGraph(url)`
+
+## Example Output
+```json
+{
+  "url": "https://example.com",
+  "status": 200,
+  "metadata": {
+    "title": "Example Domain"
+  }
+}
+```
 
 ## Error Handling
-Standard exceptions are thrown on HTTP or API errors.
+All methods throw `Error` when request transport fails or an HTTP status is non-2xx. Wrap calls in `try/catch` and implement retries for transient failures.
 
 ## Security Notes
-Requires secure transmission over HTTPS. Keep your API keys safe.
+Use HTTPS API URLs in production, apply outbound request allowlists for crawl targets, and sanitize user-provided URLs before invoking SDK calls.

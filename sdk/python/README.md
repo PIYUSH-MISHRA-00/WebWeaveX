@@ -1,19 +1,52 @@
-﻿# WebWeaveX python SDK
+# WebWeaveX Python SDK
 
 ## Installation
-Refer to package manager for python.
+```bash
+pip install webweavex
+```
 
-## Usage
-Basic usage instructions for the python SDK.
+## Quick Start
+```python
+from sdk.python.webweavex_client import WebWeaveXClient
 
-## Examples
-See examples/ directory.
+with WebWeaveXClient("http://127.0.0.1:8001") as client:
+    result = client.crawl("https://example.com")
+    print(result["status"])
+```
+
+## Usage Examples
+```python
+client = WebWeaveXClient("http://127.0.0.1:8001")
+page = client.crawl("https://example.com")
+dataset = client.rag_dataset("https://example.com")
+graph = client.knowledge_graph("https://example.com")
+client.close()
+```
 
 ## API Reference
-The main entrypoint is WebWeaveXClient.
+`WebWeaveXClient(base_url: str, timeout: float = 10.0)`
+
+`crawl(url: str) -> dict`
+
+`crawl_site(url: str) -> list[dict]`
+
+`rag_dataset(url: str) -> list[dict]`
+
+`knowledge_graph(url: str) -> dict`
+
+## Example Output
+```json
+{
+  "url": "https://example.com",
+  "status": 200,
+  "metadata": {
+    "title": "Example Domain"
+  }
+}
+```
 
 ## Error Handling
-Standard exceptions are thrown on HTTP or API errors.
+HTTP failures raise exceptions from `httpx` (`HTTPStatusError` and transport errors). Wrap SDK calls with `try/except` for retry or fallback logic.
 
 ## Security Notes
-Requires secure transmission over HTTPS. Keep your API keys safe.
+Use HTTPS for production API endpoints, validate untrusted URLs before crawling, and enforce egress/network policies in deployment environments.

@@ -8,14 +8,20 @@ script file which shares the same name.
 import sys
 from pathlib import Path
 
-# Ensure the repository root is prioritized so `import webweavex` resolves to the
-# installed package (which lives in core/webweavex).
+# Ensure the local package is prioritized.
+# The package itself lives in `core/webweavex`, while other project modules are
+# rooted at the repository root.
 ROOT = Path(__file__).resolve().parents[1]
+CORE = ROOT / "core"
+
 # Overwrite sys.path[0] (script directory) to avoid shadowing the package.
 if len(sys.path) > 0:
-    sys.path[0] = str(ROOT)
-elif str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
+    sys.path[0] = str(CORE)
+elif str(CORE) not in sys.path:
+    sys.path.insert(0, str(CORE))
+
+if str(ROOT) not in sys.path:
+    sys.path.insert(1, str(ROOT))
 
 from webweavex.cli import main
 

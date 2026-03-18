@@ -1,62 +1,58 @@
-# WebWeaveX Final Proof of Execution
+# WebWeaveX Final Proof
 
-## Phase 0: Repository Cleanup
-- Removed temporary and build artifacts (`__pycache__`, `node_modules`, `build`, `dist`).
-- Tracked status with `git status` and cleared unneeded files.
+Date: March 18, 2026
 
-## Phase 1: Structure Validation
-- Verified standard directory structures across `cli`, `sdk`, `docs`, `core`.
+## Commands, Outputs, Exit Codes
 
-## Phase 2: Core CLI
-- Command: `python cli/webweavex.py crawl https://example.com`
-- Output: Status 200, successfully fetched JSON metadata and SSL context.
-- Exit code: 0
+| Step | Command | Exit |
+| --- | --- | --- |
+| Cleanup | `Remove-Item` for `__pycache__/`, `node_modules/`, `.dart_tool/`, `build/`, `dist/`, `*.log`, `*.tmp`, `*.bak`, tracked temp `*.txt` artifacts | `0` |
+| Structure check | Directory check for `core/`, `cli/`, `sdk/`, `website/`, `docs/`, `examples/` | `0` |
+| CLI | `python cli/webweavex.py crawl https://example.com` | `0` |
+| API | `uvicorn core.webweavex.api_server:app --port 8001` + POST `/crawl`, `/rag_dataset`, `/knowledge_graph` | `0` |
+| Python SDK | `python examples/python_client.py` | `0` |
+| Node SDK | `node examples/node_client.js` | `0` |
+| Dart SDK | `dart run examples/dart_client.dart` | `0` |
+| Java SDK | `mvn -f sdk/java/pom.xml exec:java` | `0` |
+| Kotlin SDK | `mvn -f sdk/kotlin/pom.xml exec:java` | `0` |
+| Python package | `pip uninstall/install/import` verified in clean venv (`.pkg-verify3`) | `0` |
+| Node package | `npm pack` + `npm install -g ./webweavex-0.1.0.tgz` + `npm list -g webweavex` | `0` |
+| Dart package | `dart pub publish --dry-run` (clean temporary copy) | `0` |
+| Java package | `mvn -f sdk/java/pom.xml clean install` | `0` |
+| Kotlin package | `mvn -f sdk/kotlin/pom.xml clean install` | `0` |
+| Website build | `npm run build` in `website/` | `0` |
+| Test suite | `python -m unittest discover -s tests` | `0` |
 
-## Phase 3: API Server
-- Command: `uvicorn core.webweavex.api_server:app --port 8001`
-- Test: POST request with URL `https://example.com` returned expected JSON.
-- Fixes: Adjusted startup paths and ensured correct port handling.
+## Verified Runtime Results
 
-## Phase 4: SDK Execution
-### Python
-- Command: `python examples/python_client.py` -> Success.
-### Node
-- Fixes: Set URL to `http://127.0.0.1:8001`.
-- Command: `node examples/node_client.js` -> Success.
-### Dart
-- Fixes: Created proper environment in `examples/pubspec.yaml` to handle `http` package.
-- Command: `dart run dart_client.dart` -> Success.
-### Java
-- Fixes: Corrected returning object type `Map<String, Object>` mismatch in `JavaClientExample.java`.
-- Command: `mvn exec:java` -> Success.
-### Kotlin
-- Fixes: Set URL to `http://127.0.0.1:8001`.
-- Command: `mvn exec:java` -> Success.
+- CLI returned JSON with `status: 200` and valid metadata for `https://example.com`.
+- API endpoints returned `200` with expected shapes:
+  - `/crawl` object with `metadata`.
+  - `/rag_dataset` list of chunks.
+  - `/knowledge_graph` object with `nodes` and `edges`.
+- All SDK examples executed successfully against the local API server and returned JSON payloads.
+- Website production build generated `website/build` successfully.
 
-## Phase 5: Package Build
-- Python: Built using `pip install .` and `python -m build`. `setup.py` added to root.
-- Node: Built using `npm pack`.
-- Dart: Published using `dart pub publish --dry-run`. Fixed `.gitignore` logic causing interference.
-- Java/Kotlin: Built with `mvn clean install`.
+## Failures Encountered and Fixed
 
-## Phase 6: Website Build
-- Command: `npm run build` in `website/` dir. Resulting artifacts successful.
+1. CLI was importing the globally installed package instead of local source.
+   - Fix: updated `cli/webweavex.py` to prioritize `core/` on `sys.path`.
+2. SDK examples had Unicode/encoding print failures on Windows.
+   - Fix: replaced non-ASCII console markers with ASCII text.
+3. Node SDK failed with `Cannot find module 'axios'`.
+   - Fix: corrected `sdk/node/package.json` (removed self tarball dependency), reinstalled deps.
+4. Dart example failed on `package:http` resolution from root context.
+   - Fix: migrated Dart SDK/client usage to `dart:io` HTTP path and relative SDK import in example.
+5. Java/Kotlin SDKs returned `422` due request-body issue.
+   - Fix: switched both to explicit `HttpURLConnection` JSON POST handling.
+6. Java/Kotlin SDK source layout and Maven execution issues.
+   - Fix: moved Java sources to `src/main/java`, added proper Maven compiler configuration, updated Kotlin source layout.
+7. Python package import failed in clean environment due missing dependencies.
+   - Fix: added `install_requires` and `pyproject.toml` build-system metadata.
+8. Website build emitted deprecated config warnings.
+   - Fix: migrated `onBrokenMarkdownLinks` to `markdown.hooks.onBrokenMarkdownLinks`.
 
-## Phase 7: SDK Documentation
-- Generated README.md, CHANGELOG.md, LICENSE, and CONTRIBUTING.md for Python, Node, Dart, Java, and Kotlin SDKs.
+## Final State
 
-## Phase 8: Root README
-- Rewritten with CLI demos, examples, multi-language snippets, architecture, and use-cases.
-
-## Phase 9: CI/CD
-- Fixed GitHub Actions workflows to test the root context `.` instead of nonexistent directory `core/`.
-- Executed `python -m unittest discover -s tests` locally, all 24 tests passed.
-
-## Phase 10: Full System Re-run
-- Ran CLI, API, all SDK examples, packaging steps, and Docusaurus site build concurrently.
-
-## Phase 11: Final Proof
-- Compiled this report demonstrating 100% test completion and verification across all environments.
-
-## Conclusion
-All modules successfully interact. Zero warnings remaining. The repository is strictly audited and clean.
+- End-to-end CLI/API/SDK/package/website flows are executable and verified.
+- Temporary and generated artifacts are cleaned from the working tree before commit.

@@ -11,7 +11,11 @@ const config = {
   url: 'https://piyush-mishra-00.github.io',
   baseUrl: '/WebWeaveX/',
   onBrokenLinks: 'throw',
-  onBrokenMarkdownLinks: 'warn',
+  markdown: {
+    hooks: {
+      onBrokenMarkdownLinks: 'warn'
+    }
+  },
   organizationName: 'PIYUSH-MISHRA-00',
   projectName: 'WebWeaveX',
   presets: [

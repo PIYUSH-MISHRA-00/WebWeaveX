@@ -8,6 +8,10 @@
   <name>WebWeaveX Java SDK</name>
   <description>WebWeaveX Java SDK</description>
   <url>https://github.com/PIYUSH-MISHRA-00/WebWeaveX</url>
+  <properties>
+    <maven.compiler.release>11</maven.compiler.release>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
   <licenses>
     <license>
       <name>Apache-2.0</name>
@@ -23,8 +27,14 @@
     </dependency>
   </dependencies>
   <build>
-    <sourceDirectory>.</sourceDirectory>
+    <sourceDirectory>src/main/java</sourceDirectory>
+    <testSourceDirectory>src/test/java</testSourceDirectory>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.13.0</version>
+      </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>

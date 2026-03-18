@@ -1,12 +1,11 @@
-﻿import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'dart:io';
 
 class WebWeaveXClient {
-  WebWeaveXClient(this.baseUrl, {http.Client? client})
-      : _client = client ?? http.Client();
+  WebWeaveXClient(this.baseUrl);
 
   final String baseUrl;
-  final http.Client _client;
+  final HttpClient _client = HttpClient();
 
   Future<dynamic> crawl(String url) async {
     return _post('/crawl', {'url': url});
@@ -25,21 +24,20 @@ class WebWeaveXClient {
   }
 
   Future<dynamic> _post(String path, Map<String, dynamic> payload) async {
-    final uri = Uri.parse(baseUrl.replaceAll(RegExp(r'\/$'), '') + path);
-    final response = await _client.post(
-      uri,
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode(payload),
-    );
+    final uri = Uri.parse('${baseUrl.replaceAll(RegExp(r'/$'), '')}$path');
+    final request = await _client.postUrl(uri);
+    request.headers.contentType = ContentType.json;
+    request.write(jsonEncode(payload));
 
+    final response = await request.close();
+    final body = await response.transform(utf8.decoder).join();
     if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw Exception('Request failed: ${response.statusCode} ${response.body}');
+      throw HttpException('Request failed: ${response.statusCode} $body', uri: uri);
     }
-
-    return jsonDecode(response.body);
+    return jsonDecode(body);
   }
 
   void close() {
-    _client.close();
+    _client.close(force: true);
   }
 }

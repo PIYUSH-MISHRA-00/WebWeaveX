@@ -64,6 +64,9 @@ htmlcov/
 # Misc
 *.tmp
 *.swp
+.m2/
+.pkg-verify*/
+.tmp_dart_publish_check/
 
 # Runtime artifacts
 rag_dataset.jsonl
@@ -72,6 +75,10 @@ repo_dataset.jsonl
 repo_graph.graphml
 repo_summary.md
 .tmp_site/
+website/.docusaurus/
+website/.npm-cache/
+sdk/node/.npm-cache/
+sdk/node/*.tgz
 
 !sdk/dart/bin/
 !sdk/dart/lib/
