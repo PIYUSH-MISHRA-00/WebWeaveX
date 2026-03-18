@@ -33,15 +33,21 @@ client.close()
 ```
 
 ## API Reference
-`WebWeaveXClient(base_url: str, timeout: float = 10.0, max_retries: int = 2, backoff_seconds: float = 0.3, retry_statuses: set[int] | None = None)`
+`WebWeaveXClient(base_url: str, timeout: float = 10.0, max_retries: int = 2, backoff_seconds: float = 0.3, retry_statuses: set[int] | None = None, debug: bool = False, logger: Callable[[str], None] | None = None)`
 
 `crawl(url: str) -> dict[str, Any]`
 
 `crawl_site(url: str) -> list[dict[str, Any]]`
 
+`crawlSite(url: str) -> list[dict[str, Any]]`
+
 `rag_dataset(url: str) -> list[dict[str, Any]]`
 
+`ragDataset(url: str) -> list[dict[str, Any]]`
+
 `knowledge_graph(url: str) -> dict[str, list[dict[str, str]]]`
+
+`knowledgeGraph(url: str) -> dict[str, list[dict[str, str]]]`
 
 Errors:
 
@@ -75,6 +81,11 @@ except WebWeaveXTimeoutError:
   print("Retry budget exhausted due to timeout")
 except WebWeaveXHTTPError as exc:
   print(exc.status_code, exc.response_body)
+```
+
+Enable debug logging:
+```python
+client = WebWeaveXClient("http://127.0.0.1:8001", debug=True)
 ```
 
 ## Security Notes

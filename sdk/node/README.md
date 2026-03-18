@@ -49,15 +49,25 @@ Options:
 
 `retryStatusCodes` (default `[408, 429, 500, 502, 503, 504]`)
 
+`debug` (default `false`)
+
+`logger` (custom log function)
+
 Methods:
 
 `crawl(url)`
 
 `crawlSite(url)`
 
+`crawl_site(url)` (alias)
+
 `ragDataset(url)`
 
+`rag_dataset(url)` (alias)
+
 `knowledgeGraph(url)`
+
+`knowledge_graph(url)` (alias)
 
 Errors:
 
@@ -98,6 +108,11 @@ try {
     console.error(error.statusCode, error.responseBody);
   }
 }
+```
+
+Enable debug logging:
+```js
+const client = new WebWeaveXClient("http://127.0.0.1:8001", { debug: true });
 ```
 
 ## Security Notes

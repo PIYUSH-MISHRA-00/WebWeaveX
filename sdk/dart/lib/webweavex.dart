@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+typedef WebWeaveXLogger = void Function(String message);
+
 class WebWeaveXException implements Exception {
   WebWeaveXException(this.message, [this.cause]);
 
@@ -44,33 +46,46 @@ class WebWeaveXClient {
     int maxRetries = 2,
     Duration backoffBase = const Duration(milliseconds: 300),
     Set<int>? retryStatusCodes,
+    this.debug = false,
+    WebWeaveXLogger? logger,
   })  : baseUrl = baseUrl.replaceAll(RegExp(r'/$'), ''),
         _maxRetries = maxRetries < 0 ? 0 : maxRetries,
         _backoffBase = backoffBase,
-        _retryStatusCodes = retryStatusCodes ?? const {408, 429, 500, 502, 503, 504} {
+        _retryStatusCodes = retryStatusCodes ?? const {408, 429, 500, 502, 503, 504},
+        _logger = logger {
     _client.connectionTimeout = timeout;
   }
 
   final String baseUrl;
   final Duration timeout;
+  final bool debug;
   final int _maxRetries;
   final Duration _backoffBase;
   final Set<int> _retryStatusCodes;
+  final WebWeaveXLogger? _logger;
   final HttpClient _client = HttpClient();
 
   Future<dynamic> crawl(String url) => _post('/crawl', {'url': url});
 
   Future<dynamic> crawlSite(String url) => _post('/crawl_site', {'url': url});
 
+  Future<dynamic> crawl_site(String url) => crawlSite(url);
+
   Future<dynamic> ragDataset(String url) => _post('/rag_dataset', {'url': url});
 
+  Future<dynamic> rag_dataset(String url) => ragDataset(url);
+
   Future<dynamic> knowledgeGraph(String url) => _post('/knowledge_graph', {'url': url});
+
+  Future<dynamic> knowledge_graph(String url) => knowledgeGraph(url);
 
   Future<dynamic> _post(String path, Map<String, dynamic> payload) async {
     final uri = Uri.parse('$baseUrl$path');
     WebWeaveXException? lastError;
 
     for (var attempt = 0; attempt <= _maxRetries; attempt++) {
+      final attemptNo = attempt + 1;
+      _log('POST $uri attempt $attemptNo/${_maxRetries + 1}');
       try {
         final request = await _client.postUrl(uri).timeout(timeout);
         request.headers.contentType = ContentType.json;
@@ -87,12 +102,14 @@ class WebWeaveXClient {
           );
           lastError = httpError;
           if (_shouldRetryHttp(response.statusCode, attempt)) {
+            _log('${httpError.message}; retrying in ${_delayFor(attempt).inMilliseconds}ms');
             await Future<void>.delayed(_delayFor(attempt));
             continue;
           }
           throw httpError;
         }
 
+        _log('POST $uri succeeded with HTTP ${response.statusCode}');
         try {
           return jsonDecode(body);
         } on FormatException catch (error) {
@@ -109,6 +126,7 @@ class WebWeaveXClient {
       }
 
       if (attempt < _maxRetries) {
+        _log('${lastError.message}; retrying in ${_delayFor(attempt).inMilliseconds}ms');
         await Future<void>.delayed(_delayFor(attempt));
         continue;
       }
@@ -134,5 +152,12 @@ class WebWeaveXClient {
 
   void close() {
     _client.close(force: true);
+  }
+
+  void _log(String message) {
+    if (debug) {
+      final logger = _logger ?? print;
+      logger('[WebWeaveX SDK] $message');
+    }
   }
 }

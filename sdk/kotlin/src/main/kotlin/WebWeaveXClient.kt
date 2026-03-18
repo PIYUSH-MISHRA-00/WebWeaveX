@@ -16,6 +16,8 @@ class WebWeaveXClient(
   maxRetries: Int = 2,
   private val backoffMillis: Long = 300,
   retryStatusCodes: Set<Int> = DEFAULT_RETRY_STATUSES,
+  private val debug: Boolean = false,
+  private val logger: (String) -> Unit = { message -> println(message) },
 ) {
   companion object {
     private val DEFAULT_RETRY_STATUSES = setOf(408, 429, 500, 502, 503, 504)
@@ -32,9 +34,15 @@ class WebWeaveXClient(
 
   fun crawlSite(url: String): List<PageResult> = post("/crawl_site", url, PAGE_LIST_TYPE)
 
+  fun crawl_site(url: String): List<PageResult> = crawlSite(url)
+
   fun ragDataset(url: String): List<RagRecord> = post("/rag_dataset", url, RAG_LIST_TYPE)
 
+  fun rag_dataset(url: String): List<RagRecord> = ragDataset(url)
+
   fun knowledgeGraph(url: String): KnowledgeGraphResponse = post("/knowledge_graph", url, KnowledgeGraphResponse::class.java)
+
+  fun knowledge_graph(url: String): KnowledgeGraphResponse = knowledgeGraph(url)
 
   fun close() {
     // No-op: HttpURLConnection is per-request and closed after each call.
@@ -47,6 +55,8 @@ class WebWeaveXClient(
     for (attempt in 0..maxRetries) {
       var connection: HttpURLConnection? = null
       try {
+        val attemptNo = attempt + 1
+        log("POST $path attempt $attemptNo/${maxRetries + 1}")
         val endpoint = URI.create(baseUrl + path).toURL()
         connection = endpoint.openConnection() as HttpURLConnection
         connection.requestMethod = "POST"
@@ -72,12 +82,14 @@ class WebWeaveXClient(
           )
           lastError = httpError
           if (shouldRetryStatus(status, attempt)) {
+            log("${httpError.message}; retrying in ${backoffMillis * (1L shl attempt)}ms")
             sleepBackoff(attempt)
             continue
           }
           throw httpError
         }
 
+        log("POST $path succeeded with HTTP $status")
         return gson.fromJson(body, responseType)
       } catch (exception: SocketTimeoutException) {
         lastError = WebWeaveXTimeoutException("Request timed out after ${timeoutMillis}ms for $path", exception)
@@ -90,6 +102,7 @@ class WebWeaveXClient(
       }
 
       if (attempt < maxRetries) {
+        log("${lastError?.message ?: "Request failed"}; retrying in ${backoffMillis * (1L shl attempt)}ms")
         sleepBackoff(attempt)
         continue
       }
@@ -123,6 +136,12 @@ class WebWeaveXClient(
       return ""
     }
     return stream.bufferedReader(StandardCharsets.UTF_8).use { it.readText() }
+  }
+
+  private fun log(message: String) {
+    if (debug) {
+      logger("[WebWeaveX SDK] $message")
+    }
   }
 }
 

@@ -39,14 +39,21 @@ client.close();
 
 ## API Reference
 `WebWeaveXClient(String baseUrl, {Duration timeout, int maxRetries, Duration backoffBase, Set<int>? retryStatusCodes})`
+`WebWeaveXClient(String baseUrl, {Duration timeout, int maxRetries, Duration backoffBase, Set<int>? retryStatusCodes, bool debug = false, WebWeaveXLogger? logger})`
 
 `Future<dynamic> crawl(String url)`
 
 `Future<dynamic> crawlSite(String url)`
 
+`Future<dynamic> crawl_site(String url)` (alias)
+
 `Future<dynamic> ragDataset(String url)`
 
+`Future<dynamic> rag_dataset(String url)` (alias)
+
 `Future<dynamic> knowledgeGraph(String url)`
+
+`Future<dynamic> knowledge_graph(String url)` (alias)
 
 Exceptions:
 
@@ -79,6 +86,11 @@ try {
 } on WebWeaveXHttpException catch (error) {
   print('${error.statusCode}: ${error.responseBody}');
 }
+```
+
+Enable debug logging:
+```dart
+final client = WebWeaveXClient('http://127.0.0.1:8001', debug: true);
 ```
 
 ## Security Notes

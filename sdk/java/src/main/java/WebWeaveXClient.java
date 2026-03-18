@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 
 public class WebWeaveXClient {
   private static final Set<Integer> DEFAULT_RETRY_STATUSES = Set.of(408, 429, 500, 502, 503, 504);
@@ -25,9 +26,11 @@ public class WebWeaveXClient {
   private final int maxRetries;
   private final int backoffMillis;
   private final Set<Integer> retryStatuses;
+  private final boolean debug;
+  private final Consumer<String> logger;
 
   public WebWeaveXClient(String baseUrl) {
-    this(baseUrl, 10_000, 2, 300, DEFAULT_RETRY_STATUSES);
+    this(baseUrl, 10_000, 2, 300, DEFAULT_RETRY_STATUSES, false, null);
   }
 
   public WebWeaveXClient(
@@ -37,12 +40,26 @@ public class WebWeaveXClient {
       int backoffMillis,
       Set<Integer> retryStatuses
   ) {
+    this(baseUrl, timeoutMillis, maxRetries, backoffMillis, retryStatuses, false, null);
+  }
+
+  public WebWeaveXClient(
+      String baseUrl,
+      int timeoutMillis,
+      int maxRetries,
+      int backoffMillis,
+      Set<Integer> retryStatuses,
+      boolean debug,
+      Consumer<String> logger
+  ) {
     this.baseUrl = baseUrl.replaceAll("/$", "");
     this.gson = new Gson();
     this.timeoutMillis = Math.max(1, timeoutMillis);
     this.maxRetries = Math.max(0, maxRetries);
     this.backoffMillis = Math.max(0, backoffMillis);
     this.retryStatuses = retryStatuses == null ? DEFAULT_RETRY_STATUSES : retryStatuses;
+    this.debug = debug;
+    this.logger = logger == null ? System.out::println : logger;
   }
 
   public PageResult crawl(String url) throws WebWeaveXException {
@@ -68,6 +85,8 @@ public class WebWeaveXClient {
     for (int attempt = 0; attempt <= maxRetries; attempt++) {
       HttpURLConnection connection = null;
       try {
+        int attemptNo = attempt + 1;
+        log("POST " + path + " attempt " + attemptNo + "/" + (maxRetries + 1));
         URL endpoint = URI.create(baseUrl + path).toURL();
         connection = (HttpURLConnection) endpoint.openConnection();
         connection.setRequestMethod("POST");
@@ -93,12 +112,14 @@ public class WebWeaveXClient {
           );
           lastError = error;
           if (shouldRetryStatus(status, attempt)) {
+            log(error.getMessage() + "; retrying in " + (backoffMillis * (1L << attempt)) + "ms");
             sleepBackoff(attempt);
             continue;
           }
           throw error;
         }
 
+        log("POST " + path + " succeeded with HTTP " + status);
         return gson.fromJson(body, responseType);
       } catch (SocketTimeoutException exception) {
         lastError = new WebWeaveXTimeoutException(
@@ -116,6 +137,9 @@ public class WebWeaveXClient {
       }
 
       if (attempt < maxRetries) {
+        if (lastError != null) {
+          log(lastError.getMessage() + "; retrying in " + (backoffMillis * (1L << attempt)) + "ms");
+        }
         sleepBackoff(attempt);
         continue;
       }
@@ -152,6 +176,12 @@ public class WebWeaveXClient {
     }
     try (stream) {
       return new String(stream.readAllBytes(), StandardCharsets.UTF_8);
+    }
+  }
+
+  private void log(String message) {
+    if (debug) {
+      logger.accept("[WebWeaveX SDK] " + message);
     }
   }
 

@@ -1,35 +1,48 @@
 # WebWeaveX
 
-**Turn websites into clean crawl data, RAG-ready chunks, and knowledge graphs from one platform.**
+**The web ingestion toolkit for AI teams: crawl once, ship structured data everywhere.**
 
-[![CI](https://img.shields.io/github/actions/workflow/status/PIYUSH-MISHRA-00/WebWeaveX/ci.yml?branch=main&label=CI)](https://github.com/PIYUSH-MISHRA-00/WebWeaveX/actions/workflows/ci.yml)
+[![CI](https://github.com/PIYUSH-MISHRA-00/WebWeaveX/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/PIYUSH-MISHRA-00/WebWeaveX/actions/workflows/ci.yml)
 [![Version](https://img.shields.io/badge/version-0.1.0-blue)](https://github.com/PIYUSH-MISHRA-00/WebWeaveX/releases)
 [![License](https://img.shields.io/badge/license-Apache--2.0-green)](LICENSE)
 
-## Demo
+## 10-Second Demo
 
-CLI:
 ```bash
+uvicorn core.webweavex.api_server:app --port 8001
 python cli/webweavex.py crawl https://example.com
 ```
 
-SDK (Python):
+Expected: JSON with `status: 200`, page metadata, and extracted links.
+
+## Ultra Simple Example
+
 ```python
 from sdk.python.webweavex_client import WebWeaveXClient
 
 with WebWeaveXClient("http://127.0.0.1:8001") as client:
-  page = client.crawl("https://example.com")
-  print(page["status"], page["metadata"]["title"])
+  print(client.crawl("https://example.com")["status"])
 ```
 
-## Why WebWeaveX
+## Why This Exists
 
-Most crawler stacks split into separate tools for crawling, enrichment, RAG chunking, and graph extraction. WebWeaveX keeps this in one runtime so teams can ship faster and avoid glue-code drift.
+Most teams still stitch together crawler scripts, custom cleaners, and separate graph/RAG jobs. That creates fragile pipelines and duplicated failure handling. WebWeaveX exists to make web ingestion predictable, language-agnostic, and production-ready from day one.
 
 - One API for crawl, RAG datasets, and knowledge graphs.
 - Multi-language SDKs for Python, Node.js, Dart, Java, and Kotlin.
 - Production defaults: timeout controls, retries, SSL verification, typed responses (Java/Kotlin).
 - CLI + API + docs website in one repository.
+
+## Comparison
+
+| Capability | DIY Scraper Scripts | HTML Parser Libraries | WebWeaveX |
+| --- | --- | --- | --- |
+| Single-page crawl | Usually | Yes | Yes |
+| Site crawl orchestration | Manual | No | Yes |
+| RAG dataset output | Manual | No | Yes |
+| Knowledge graph output | Manual | No | Yes |
+| Multi-language SDKs | Rare | No | Yes |
+| Built-in retry/timeout handling | Usually partial | No | Yes |
 
 ## Features
 
@@ -132,6 +145,10 @@ Repro scripts live in `benchmarks/`.
 - First-class observability pack (metrics + tracing dashboards).
 - Expanded examples for enterprise SSO docs and multi-tenant usage.
 - Package publishing automation for PyPI, npm, pub.dev, and Maven Central.
+
+## Release Notes
+
+- `v0.1.0`: `docs/releases/v0.1.0.md`
 
 ## Repository Structure
 

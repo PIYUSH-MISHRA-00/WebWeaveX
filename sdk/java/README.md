@@ -36,6 +36,8 @@ WebWeaveXClient.KnowledgeGraphResponse graph = client.knowledgeGraph("https://ex
 
 `WebWeaveXClient(String baseUrl, int timeoutMillis, int maxRetries, int backoffMillis, Set<Integer> retryStatuses)`
 
+`WebWeaveXClient(String baseUrl, int timeoutMillis, int maxRetries, int backoffMillis, Set<Integer> retryStatuses, boolean debug, Consumer<String> logger)`
+
 `PageResult crawl(String url)`
 
 `List<PageResult> crawlSite(String url)`
@@ -63,6 +65,19 @@ Exceptions:
     "title": "Example Domain"
   }
 }
+```
+
+Enable debug logging:
+```java
+WebWeaveXClient client = new WebWeaveXClient(
+    "http://127.0.0.1:8001",
+    10_000,
+    2,
+    300,
+    Set.of(408, 429, 500, 502, 503, 504),
+    true,
+    System.out::println
+);
 ```
 
 ## Error Handling
