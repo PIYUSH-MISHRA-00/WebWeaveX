@@ -6,12 +6,32 @@ build-backend = "hatchling.build"
 name = "webweavex"
 version = "0.1.0"
 description = "AI-native web crawling platform"
-requires-python = ">=3.11"
+readme = { file = "README.md", content-type = "text/markdown" }
+requires-python = ">=3.8"
 license = { text = "Apache-2.0" }
-keywords = ["crawler", "web", "scraping", "rag", "knowledge-graph"]
+
 authors = [
-  { name = "WebWeaveX Maintainers" }
+  { name = "Piyush Mishra" }
 ]
+
+keywords = [
+  "crawler",
+  "web scraping",
+  "rag",
+  "knowledge graph",
+  "ai",
+  "data extraction"
+]
+
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: Apache Software License",
+  "Operating System :: OS Independent",
+  "Intended Audience :: Developers",
+  "Topic :: Internet :: WWW/HTTP",
+  "Topic :: Software Development :: Libraries"
+]
+
 dependencies = [
   "httpx>=0.25.0",
   "beautifulsoup4>=4.12.0",

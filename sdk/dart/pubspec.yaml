@@ -1,5 +1,5 @@
 name: webweavex
-description: Production-ready Dart SDK for WebWeaveX crawling, RAG dataset, and knowledge graph APIs.
+description: AI-native web crawling platform
 version: 0.1.0
 homepage: https://piyush-mishra-00.github.io/WebWeaveX
 repository: https://github.com/PIYUSH-MISHRA-00/WebWeaveX
@@ -12,7 +12,9 @@ topics:
   - sdk
   - api-client
 environment:
-  sdk: ">=2.19.0 <4.0.0"
-dependencies: {}
+  sdk: ">=2.17.0 <4.0.0"
+dependencies:
+  http: ^1.0.0
 dev_dependencies:
   test: ^1.30.0
+  lints: ^2.0.0

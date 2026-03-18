@@ -15,21 +15,24 @@ class WebWeaveXException implements Exception {
 }
 
 class WebWeaveXTimeoutException extends WebWeaveXException {
-  WebWeaveXTimeoutException(String message, [Object? cause]) : super(message, cause);
+  WebWeaveXTimeoutException(String message, [Object? cause])
+      : super(message, cause);
 
   @override
   String toString() => 'WebWeaveXTimeoutException: $message';
 }
 
 class WebWeaveXNetworkException extends WebWeaveXException {
-  WebWeaveXNetworkException(String message, [Object? cause]) : super(message, cause);
+  WebWeaveXNetworkException(String message, [Object? cause])
+      : super(message, cause);
 
   @override
   String toString() => 'WebWeaveXNetworkException: $message';
 }
 
 class WebWeaveXHttpException extends WebWeaveXException {
-  WebWeaveXHttpException(this.statusCode, String message, this.responseBody, [Object? cause])
+  WebWeaveXHttpException(this.statusCode, String message, this.responseBody,
+      [Object? cause])
       : super(message, cause);
 
   final int statusCode;
@@ -51,7 +54,8 @@ class WebWeaveXClient {
   })  : baseUrl = baseUrl.replaceAll(RegExp(r'/$'), ''),
         _maxRetries = maxRetries < 0 ? 0 : maxRetries,
         _backoffBase = backoffBase,
-        _retryStatusCodes = retryStatusCodes ?? const {408, 429, 500, 502, 503, 504},
+        _retryStatusCodes =
+            retryStatusCodes ?? const {408, 429, 500, 502, 503, 504},
         _logger = logger {
     _client.connectionTimeout = timeout;
   }
@@ -75,7 +79,8 @@ class WebWeaveXClient {
 
   Future<dynamic> rag_dataset(String url) => ragDataset(url);
 
-  Future<dynamic> knowledgeGraph(String url) => _post('/knowledge_graph', {'url': url});
+  Future<dynamic> knowledgeGraph(String url) =>
+      _post('/knowledge_graph', {'url': url});
 
   Future<dynamic> knowledge_graph(String url) => knowledgeGraph(url);
 
@@ -92,7 +97,8 @@ class WebWeaveXClient {
         request.write(jsonEncode(payload));
 
         final response = await request.close().timeout(timeout);
-        final body = await response.transform(utf8.decoder).join().timeout(timeout);
+        final body =
+            await response.transform(utf8.decoder).join().timeout(timeout);
 
         if (response.statusCode < 200 || response.statusCode >= 300) {
           final httpError = WebWeaveXHttpException(
@@ -102,7 +108,8 @@ class WebWeaveXClient {
           );
           lastError = httpError;
           if (_shouldRetryHttp(response.statusCode, attempt)) {
-            _log('${httpError.message}; retrying in ${_delayFor(attempt).inMilliseconds}ms');
+            _log(
+                '${httpError.message}; retrying in ${_delayFor(attempt).inMilliseconds}ms');
             await Future<void>.delayed(_delayFor(attempt));
             continue;
           }
@@ -116,17 +123,21 @@ class WebWeaveXClient {
           throw WebWeaveXException('Invalid JSON response from $uri', error);
         }
       } on TimeoutException catch (error) {
-        lastError = WebWeaveXTimeoutException('Request timed out for $uri', error);
+        lastError =
+            WebWeaveXTimeoutException('Request timed out for $uri', error);
       } on SocketException catch (error) {
-        lastError = WebWeaveXNetworkException('Network failure for $uri', error);
+        lastError =
+            WebWeaveXNetworkException('Network failure for $uri', error);
       } on WebWeaveXException catch (error) {
         lastError = error;
       } catch (error) {
-        lastError = WebWeaveXException('Unexpected error for $uri: $error', error);
+        lastError =
+            WebWeaveXException('Unexpected error for $uri: $error', error);
       }
 
       if (attempt < _maxRetries) {
-        _log('${lastError.message}; retrying in ${_delayFor(attempt).inMilliseconds}ms');
+        _log(
+            '${lastError.message}; retrying in ${_delayFor(attempt).inMilliseconds}ms');
         await Future<void>.delayed(_delayFor(attempt));
         continue;
       }
