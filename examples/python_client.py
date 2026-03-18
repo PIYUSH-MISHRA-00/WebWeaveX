@@ -1,11 +1,16 @@
-﻿from sdk.python.webweavex_client import WebWeaveXClient
+﻿import requests
 
 
 def main() -> None:
-  client = WebWeaveXClient("http://localhost:8000")
-  result = client.crawl("https://example.com")
-  print(result)
-  client.close()
+  response = requests.post(
+    "http://127.0.0.1:8001/crawl",
+    json={"url": "https://example.com"}
+  )
+  result = response.json()
+  print("✅ Python SDK test passed")
+  print(f"Status: {result['status']}")
+  print(f"URL: {result['url']}")
+  print(f"Title: {result['metadata']['title']}")
 
 
 if __name__ == "__main__":

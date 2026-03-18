@@ -72,3 +72,6 @@ repo_dataset.jsonl
 repo_graph.graphml
 repo_summary.md
 .tmp_site/
+
+!sdk/dart/bin/
+!sdk/dart/lib/

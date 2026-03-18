@@ -1,0 +1,26 @@
+{
+  "timestamp": "2026-03-16T16:31:02.636620+00:00",
+  "config": {
+    "max_pages": 20,
+    "max_depth": 2
+  },
+  "targets": [
+    {
+      "url": "https://example.com",
+      "pages_crawled": 0,
+      "crawl_time_seconds": 2.0433,
+      "pages_per_second": 0.0,
+      "error": "Failed to fetch https://example.com/"
+    },
+    {
+      "url": "https://docs.python.org",
+      "pages_crawled": 20,
+      "crawl_time_seconds": 7.3946,
+      "pages_per_second": 2.7047,
+      "error": null
+    }
+  ],
+  "total_pages": 20,
+  "total_time_seconds": 9.4379,
+  "total_pages_per_second": 2.1191
+}

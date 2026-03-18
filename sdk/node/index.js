@@ -1,6 +1,12 @@
-﻿class WebWeaveXClient {
+﻿const axios = require('axios');
+
+class WebWeaveXClient {
   constructor(baseUrl) {
     this.baseUrl = baseUrl.replace(/\/$/, "");
+    this.client = axios.create({
+      timeout: 10000,
+      headers: { "Content-Type": "application/json" }
+    });
   }
 
   async crawl(url) {
@@ -20,18 +26,18 @@
   }
 
   async _post(path, payload) {
-    const response = await fetch(`${this.baseUrl}${path}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
-
-    if (!response.ok) {
-      const text = await response.text();
-      throw new Error(`Request failed: ${response.status} ${text}`);
+    try {
+      const response = await this.client.post(`${this.baseUrl}${path}`, payload);
+      return response.data;
+    } catch (error) {
+      if (error.response) {
+        throw new Error(`Request failed: ${error.response.status} ${error.response.statusText}`);
+      } else if (error.request) {
+        throw new Error(`Request failed: No response received`);
+      } else {
+        throw new Error(`Request failed: ${error.message}`);
+      }
     }
-
-    return await response.json();
   }
 }
 

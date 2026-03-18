@@ -1,4 +1,5 @@
 ﻿from dataclasses import dataclass, field
+import os
 
 DEFAULT_HEADERS: dict[str, str] = {
   "User-Agent": "WebWeaveX/0.1 (+https://github.com/PIYUSH-MISHRA-00/WebWeaveX)"
@@ -34,3 +35,9 @@ class CrawlConfig:
   worker_id: str = "worker-1"
   redis_host: str = "localhost"
   redis_port: int = 6379
+
+  # SSL verification for HTTPS requests.
+  # - True: use system certificate store (default, recommended)
+  # - False: disable verification (INSECURE - testing only)
+  # - str: path to custom CA bundle file
+  ssl_verify: bool | str = True

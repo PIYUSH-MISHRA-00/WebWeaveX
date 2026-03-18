@@ -8,6 +8,7 @@ from .config import CrawlConfig
 from .exceptions import FetchError
 from .logging import get_logger
 from .rate_limiter import RateLimiter
+from .ssl_utils import get_ssl_verify
 
 logger = get_logger(__name__)
 
@@ -25,10 +26,14 @@ class AsyncFetcher:
       write=config.write_timeout,
       pool=config.pool_timeout,
     )
+    
+    verify = get_ssl_verify(config.ssl_verify)
+
     self._client = client or httpx.AsyncClient(
       timeout=timeout,
       headers=config.headers,
       follow_redirects=True,
+      verify=verify,
     )
     self._owns_client = client is None
 

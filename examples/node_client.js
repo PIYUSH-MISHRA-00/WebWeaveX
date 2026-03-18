@@ -1,8 +1,9 @@
-﻿const { WebWeaveXClient } = require("../sdk/node/index.js");
+const { WebWeaveXClient } = require("../sdk/node/index");
 
 async function main() {
-  const client = new WebWeaveXClient("http://localhost:8000");
-  const result = await client.crawl("https://example.com");
+  const client = new WebWeaveXClient("http://127.0.0.1:8001");
+  const result = await client.crawl("http://example.com");
+  console.log("✅ Node SDK test passed");
   console.log(result);
 }
 

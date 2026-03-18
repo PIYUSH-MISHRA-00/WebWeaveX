@@ -8,19 +8,19 @@ class WebWeaveXClient {
   final String baseUrl;
   final http.Client _client;
 
-  Future<Map<String, dynamic>> crawl(String url) async {
+  Future<dynamic> crawl(String url) async {
     return _post('/crawl', {'url': url});
   }
 
-  Future<List<dynamic>> crawlSite(String url) async {
+  Future<dynamic> crawlSite(String url) async {
     return _post('/crawl_site', {'url': url});
   }
 
-  Future<List<dynamic>> ragDataset(String url) async {
+  Future<dynamic> ragDataset(String url) async {
     return _post('/rag_dataset', {'url': url});
   }
 
-  Future<Map<String, dynamic>> knowledgeGraph(String url) async {
+  Future<dynamic> knowledgeGraph(String url) async {
     return _post('/knowledge_graph', {'url': url});
   }
 

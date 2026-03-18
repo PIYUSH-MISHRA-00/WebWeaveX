@@ -1,4 +1,4 @@
-﻿[build-system]
+[build-system]
 requires = ["hatchling>=1.21.0"]
 build-backend = "hatchling.build"
 
@@ -21,11 +21,13 @@ dependencies = [
   "fastapi>=0.110.0",
   "uvicorn>=0.29.0",
   "spacy>=3.7.0",
-  "redis>=5.0"
+  "redis>=5.0",
+  "networkx>=3.0",
+  "certifi>=2024.9.0"
 ]
 
 [project.scripts]
-webweavex = "cli.webweavex:main"
+webweavex = "webweavex.cli:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["webweavex"]
