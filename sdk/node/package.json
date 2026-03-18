@@ -3,18 +3,31 @@
   "version": "0.1.0",
   "description": "WebWeaveX SDK for Node.js",
   "main": "index.js",
+  "exports": "./index.js",
   "type": "commonjs",
   "license": "Apache-2.0",
+  "homepage": "https://piyush-mishra-00.github.io/WebWeaveX/",
   "repository": {
     "type": "git",
-    "url": "https://github.com/PIYUSH-MISHRA-00/WebWeaveX"
+    "url": "git+https://github.com/PIYUSH-MISHRA-00/WebWeaveX.git"
+  },
+  "bugs": {
+    "url": "https://github.com/PIYUSH-MISHRA-00/WebWeaveX/issues"
   },
   "keywords": [
     "webweavex",
     "crawler",
+    "web-crawler",
+    "web-scraping",
     "rag",
     "knowledge-graph",
-    "sdk"
+    "sdk",
+    "api-client"
+  ],
+  "files": [
+    "index.js",
+    "README.md",
+    "LICENSE"
   ],
   "engines": {
     "node": ">=18"

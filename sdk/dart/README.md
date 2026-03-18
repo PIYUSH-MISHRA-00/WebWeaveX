@@ -10,7 +10,11 @@ dart pub add webweavex
 import 'package:webweavex/webweavex.dart';
 
 Future<void> main() async {
-  final client = WebWeaveXClient('http://127.0.0.1:8001');
+  final client = WebWeaveXClient(
+    'http://127.0.0.1:8001',
+    timeout: const Duration(seconds: 10),
+    maxRetries: 2,
+  );
   final result = await client.crawl('https://example.com');
   print(result['status']);
   client.close();
@@ -19,15 +23,22 @@ Future<void> main() async {
 
 ## Usage Examples
 ```dart
-final client = WebWeaveXClient('http://127.0.0.1:8001');
+final client = WebWeaveXClient(
+  'http://127.0.0.1:8001',
+  timeout: const Duration(seconds: 8),
+  maxRetries: 3,
+  backoffBase: const Duration(milliseconds: 400),
+);
+
 final page = await client.crawl('https://example.com');
 final dataset = await client.ragDataset('https://example.com');
 final graph = await client.knowledgeGraph('https://example.com');
+
 client.close();
 ```
 
 ## API Reference
-`WebWeaveXClient(String baseUrl)`
+`WebWeaveXClient(String baseUrl, {Duration timeout, int maxRetries, Duration backoffBase, Set<int>? retryStatusCodes})`
 
 `Future<dynamic> crawl(String url)`
 
@@ -36,6 +47,16 @@ client.close();
 `Future<dynamic> ragDataset(String url)`
 
 `Future<dynamic> knowledgeGraph(String url)`
+
+Exceptions:
+
+`WebWeaveXException`
+
+`WebWeaveXTimeoutException`
+
+`WebWeaveXNetworkException`
+
+`WebWeaveXHttpException`
 
 ## Example Output
 ```json
@@ -49,7 +70,18 @@ client.close();
 ```
 
 ## Error Handling
-SDK methods throw `HttpException` for non-2xx responses. Use `try/catch` around calls and inspect status/body values when handling failures.
+```dart
+try {
+  final result = await client.crawl('https://example.com');
+  print(result['status']);
+} on WebWeaveXTimeoutException {
+  print('Request timed out after retries');
+} on WebWeaveXHttpException catch (error) {
+  print('${error.statusCode}: ${error.responseBody}');
+}
+```
 
 ## Security Notes
-Use HTTPS base URLs for production, restrict crawl targets by policy, and avoid processing untrusted URLs without validation.
+- Prefer HTTPS base URLs in production.
+- Validate user-provided URLs before crawl requests.
+- Limit network egress from runtime environments to approved destinations only.

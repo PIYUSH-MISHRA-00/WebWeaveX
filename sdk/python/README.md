@@ -9,30 +9,49 @@ pip install webweavex
 ```python
 from sdk.python.webweavex_client import WebWeaveXClient
 
-with WebWeaveXClient("http://127.0.0.1:8001") as client:
-    result = client.crawl("https://example.com")
-    print(result["status"])
+with WebWeaveXClient("http://127.0.0.1:8001", timeout=10.0, max_retries=2) as client:
+  page = client.crawl("https://example.com")
+  print(page["status"])
 ```
 
 ## Usage Examples
 ```python
-client = WebWeaveXClient("http://127.0.0.1:8001")
+from sdk.python.webweavex_client import WebWeaveXClient
+
+client = WebWeaveXClient(
+  "http://127.0.0.1:8001",
+  timeout=8.0,
+  max_retries=3,
+  backoff_seconds=0.4,
+)
+
 page = client.crawl("https://example.com")
 dataset = client.rag_dataset("https://example.com")
 graph = client.knowledge_graph("https://example.com")
+
 client.close()
 ```
 
 ## API Reference
-`WebWeaveXClient(base_url: str, timeout: float = 10.0)`
+`WebWeaveXClient(base_url: str, timeout: float = 10.0, max_retries: int = 2, backoff_seconds: float = 0.3, retry_statuses: set[int] | None = None)`
 
-`crawl(url: str) -> dict`
+`crawl(url: str) -> dict[str, Any]`
 
-`crawl_site(url: str) -> list[dict]`
+`crawl_site(url: str) -> list[dict[str, Any]]`
 
-`rag_dataset(url: str) -> list[dict]`
+`rag_dataset(url: str) -> list[dict[str, Any]]`
 
-`knowledge_graph(url: str) -> dict`
+`knowledge_graph(url: str) -> dict[str, list[dict[str, str]]]`
+
+Errors:
+
+`WebWeaveXError`
+
+`WebWeaveXTimeoutError`
+
+`WebWeaveXNetworkError`
+
+`WebWeaveXHTTPError`
 
 ## Example Output
 ```json
@@ -46,7 +65,19 @@ client.close()
 ```
 
 ## Error Handling
-HTTP failures raise exceptions from `httpx` (`HTTPStatusError` and transport errors). Wrap SDK calls with `try/except` for retry or fallback logic.
+```python
+from sdk.python.webweavex_client import WebWeaveXClient, WebWeaveXTimeoutError, WebWeaveXHTTPError
+
+client = WebWeaveXClient("http://127.0.0.1:8001", max_retries=2)
+try:
+  client.crawl("https://example.com")
+except WebWeaveXTimeoutError:
+  print("Retry budget exhausted due to timeout")
+except WebWeaveXHTTPError as exc:
+  print(exc.status_code, exc.response_body)
+```
 
 ## Security Notes
-Use HTTPS for production API endpoints, validate untrusted URLs before crawling, and enforce egress/network policies in deployment environments.
+- Use HTTPS for production API endpoints.
+- Validate and sanitize user-supplied URLs before crawl requests.
+- Apply network egress policies so crawler workers can only reach approved domains.

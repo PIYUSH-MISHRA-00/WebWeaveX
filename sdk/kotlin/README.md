@@ -12,28 +12,47 @@
 ## Quick Start
 ```kotlin
 val client = WebWeaveXClient("http://127.0.0.1:8001")
-val result = client.crawl("https://example.com")
-println(result)
+val page = client.crawl("https://example.com")
+println(page.status)
+client.close()
 ```
 
 ## Usage Examples
 ```kotlin
-val client = WebWeaveXClient("http://127.0.0.1:8001")
+val client = WebWeaveXClient(
+  baseUrl = "http://127.0.0.1:8001",
+  timeoutMillis = 8_000,
+  maxRetries = 3,
+  backoffMillis = 400,
+)
+
 val page = client.crawl("https://example.com")
 val dataset = client.ragDataset("https://example.com")
 val graph = client.knowledgeGraph("https://example.com")
+
+client.close()
 ```
 
 ## API Reference
-`WebWeaveXClient(baseUrl: String)`
+`WebWeaveXClient(baseUrl: String, timeoutMillis: Int = 10000, maxRetries: Int = 2, backoffMillis: Long = 300, retryStatusCodes: Set<Int> = setOf(408, 429, 500, 502, 503, 504))`
 
-`crawl(url: String): String`
+`crawl(url: String): PageResult`
 
-`crawlSite(url: String): String`
+`crawlSite(url: String): List<PageResult>`
 
-`ragDataset(url: String): String`
+`ragDataset(url: String): List<RagRecord>`
 
-`knowledgeGraph(url: String): String`
+`knowledgeGraph(url: String): KnowledgeGraphResponse`
+
+Exceptions:
+
+`WebWeaveXException`
+
+`WebWeaveXTimeoutException`
+
+`WebWeaveXNetworkException`
+
+`WebWeaveXHttpException`
 
 ## Example Output
 ```json
@@ -47,7 +66,15 @@ val graph = client.knowledgeGraph("https://example.com")
 ```
 
 ## Error Handling
-SDK calls throw `IOException` when the API returns non-2xx responses. Wrap calls with `try/catch` and inspect returned status details.
+```kotlin
+try {
+  client.crawl("https://example.com")
+} catch (error: WebWeaveXHttpException) {
+  println("${error.statusCode}: ${error.responseBody}")
+}
+```
 
 ## Security Notes
-Use HTTPS for production endpoints, enforce URL allowlists for crawl jobs, and run agents in restricted network contexts.
+- Use HTTPS in production environments.
+- Validate and sanitize crawl URLs before API calls.
+- Restrict runtime egress permissions for crawling workloads.

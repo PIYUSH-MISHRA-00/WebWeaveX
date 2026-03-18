@@ -3,36 +3,47 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  
+
   <groupId>io.webweavex</groupId>
   <artifactId>webweavex-kotlin</artifactId>
   <version>0.1.0</version>
   <name>WebWeaveX Kotlin SDK</name>
-  <description>WebWeaveX Kotlin/JVM SDK</description>
+  <description>Typed Kotlin/JVM SDK for WebWeaveX crawl, RAG dataset, and knowledge graph APIs.</description>
   <url>https://github.com/PIYUSH-MISHRA-00/WebWeaveX</url>
-  
+
   <licenses>
     <license>
       <name>Apache-2.0</name>
       <url>https://www.apache.org/licenses/LICENSE-2.0</url>
+      <distribution>repo</distribution>
     </license>
   </licenses>
-  
+
+  <scm>
+    <connection>scm:git:https://github.com/PIYUSH-MISHRA-00/WebWeaveX.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/PIYUSH-MISHRA-00/WebWeaveX.git</developerConnection>
+    <url>https://github.com/PIYUSH-MISHRA-00/WebWeaveX</url>
+  </scm>
+
   <properties>
     <maven.compiler.release>11</maven.compiler.release>
     <kotlin.version>1.9.10</kotlin.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
-  
+
   <dependencies>
     <dependency>
       <groupId>org.jetbrains.kotlin</groupId>
       <artifactId>kotlin-stdlib-jdk8</artifactId>
       <version>${kotlin.version}</version>
     </dependency>
-    
+    <dependency>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
+      <version>2.10.1</version>
+    </dependency>
   </dependencies>
-  
+
   <build>
     <sourceDirectory>src/main/kotlin</sourceDirectory>
     <testSourceDirectory>src/test/kotlin</testSourceDirectory>
@@ -61,13 +72,6 @@
           <jvmTarget>11</jvmTarget>
         </configuration>
       </plugin>
-      
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <version>3.3.0</version>
-      </plugin>
-      
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>

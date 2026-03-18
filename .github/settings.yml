@@ -1,0 +1,16 @@
+repository:
+  name: WebWeaveX
+  description: "AI-native crawler with API, CLI, and SDKs for Python, Node.js, Dart, Java, and Kotlin."
+  homepage: "https://piyush-mishra-00.github.io/WebWeaveX/"
+  topics:
+    - crawler
+    - web-scraping
+    - rag
+    - knowledge-graph
+    - sdk
+    - fastapi
+    - docusaurus
+  private: false
+  has_issues: true
+  has_projects: true
+  has_wiki: false

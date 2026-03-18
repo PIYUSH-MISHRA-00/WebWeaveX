@@ -2,16 +2,14 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
+
   <groupId>io.webweavex</groupId>
-  <artifactId>webweavex</artifactId>
+  <artifactId>webweavex-java</artifactId>
   <version>0.1.0</version>
   <name>WebWeaveX Java SDK</name>
-  <description>WebWeaveX Java SDK</description>
+  <description>Typed Java SDK for WebWeaveX crawl, RAG dataset, and knowledge graph APIs.</description>
   <url>https://github.com/PIYUSH-MISHRA-00/WebWeaveX</url>
-  <properties>
-    <maven.compiler.release>11</maven.compiler.release>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
+
   <licenses>
     <license>
       <name>Apache-2.0</name>
@@ -19,6 +17,18 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
+
+  <scm>
+    <connection>scm:git:https://github.com/PIYUSH-MISHRA-00/WebWeaveX.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/PIYUSH-MISHRA-00/WebWeaveX.git</developerConnection>
+    <url>https://github.com/PIYUSH-MISHRA-00/WebWeaveX</url>
+  </scm>
+
+  <properties>
+    <maven.compiler.release>11</maven.compiler.release>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>com.google.code.gson</groupId>
@@ -26,6 +36,7 @@
       <version>2.10.1</version>
     </dependency>
   </dependencies>
+
   <build>
     <sourceDirectory>src/main/java</sourceDirectory>
     <testSourceDirectory>src/test/java</testSourceDirectory>

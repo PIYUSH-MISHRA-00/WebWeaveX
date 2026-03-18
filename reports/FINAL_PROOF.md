@@ -1,58 +1,58 @@
-# WebWeaveX Final Proof
+# WebWeaveX FINAL PROOF
 
-Date: March 18, 2026
+Date: 2026-03-18  
+Workspace: `C:\Projects\WebWeaveX`
 
-## Commands, Outputs, Exit Codes
+## Command Execution Log
 
-| Step | Command | Exit |
-| --- | --- | --- |
-| Cleanup | `Remove-Item` for `__pycache__/`, `node_modules/`, `.dart_tool/`, `build/`, `dist/`, `*.log`, `*.tmp`, `*.bak`, tracked temp `*.txt` artifacts | `0` |
-| Structure check | Directory check for `core/`, `cli/`, `sdk/`, `website/`, `docs/`, `examples/` | `0` |
-| CLI | `python cli/webweavex.py crawl https://example.com` | `0` |
-| API | `uvicorn core.webweavex.api_server:app --port 8001` + POST `/crawl`, `/rag_dataset`, `/knowledge_graph` | `0` |
-| Python SDK | `python examples/python_client.py` | `0` |
-| Node SDK | `node examples/node_client.js` | `0` |
-| Dart SDK | `dart run examples/dart_client.dart` | `0` |
-| Java SDK | `mvn -f sdk/java/pom.xml exec:java` | `0` |
-| Kotlin SDK | `mvn -f sdk/kotlin/pom.xml exec:java` | `0` |
-| Python package | `pip uninstall/install/import` verified in clean venv (`.pkg-verify3`) | `0` |
-| Node package | `npm pack` + `npm install -g ./webweavex-0.1.0.tgz` + `npm list -g webweavex` | `0` |
-| Dart package | `dart pub publish --dry-run` (clean temporary copy) | `0` |
-| Java package | `mvn -f sdk/java/pom.xml clean install` | `0` |
-| Kotlin package | `mvn -f sdk/kotlin/pom.xml clean install` | `0` |
-| Website build | `npm run build` in `website/` | `0` |
-| Test suite | `python -m unittest discover -s tests` | `0` |
+| Area | Command | Exit Code | Verification Result |
+| --- | --- | --- | --- |
+| Structure | `Test-Path core/ cli/ sdk/ website/ docs/ examples/` | `0` | All required directories present |
+| CLI | `python cli/webweavex.py crawl https://example.com` | `0` | JSON returned with `"status": 200` and `"title": "Example Domain"` |
+| API server + endpoints | `uvicorn core.webweavex.api_server:app --port 8001` + POST `/crawl`, `/rag_dataset`, `/knowledge_graph` | `0` | All 3 endpoints returned `200` and valid JSON payloads |
+| Python SDK | `python examples/python_client.py` | `0` | Crawl succeeded with status `200` |
+| Node SDK | `node examples/node_client.js` | `0` | Crawl succeeded with status `200` |
+| Dart SDK | `dart run examples/dart_client.dart` | `0` | Crawl succeeded with status `200` |
+| Java SDK | `mvn -f sdk/java/pom.xml compile exec:java -DskipTests` | `0` | Typed `PageResult` printed with status `200` |
+| Kotlin SDK | `mvn -f sdk/kotlin/pom.xml compile exec:java -DskipTests` | `0` | Typed `PageResult` printed with status `200` |
+| Python package | `python -m pip uninstall webweavex -y && python -m pip install . && python -c "import webweavex"` | `0` | Install and import succeeded |
+| Node package | `npm pack` + `npm install -g ./webweavex-0.1.0.tgz` + `npm list -g webweavex` | `0` | Tarball built and global install verified |
+| Node global import | `node -e "require(<globalRoot>/webweavex)"` | `0` | `WebWeaveXClient` exported successfully |
+| Dart package | `dart pub publish --dry-run` in clean temp copy of `sdk/dart` | `0` | Validation passed with `Package has 0 warnings.` |
+| Java package | `mvn -f sdk/java/pom.xml clean install` | `0` | JAR built and installed to local Maven repo |
+| Kotlin package | `mvn -f sdk/kotlin/pom.xml clean install` | `0` | JAR built and installed to local Maven repo |
+| Website deps | `npm install @docusaurus/core @docusaurus/preset-classic prism-react-renderer` (in `website/`) | `0` | Dependencies installed |
+| Website build | `npm run build` (in `website/`) | `0` | Static site generated in `website/build` |
+| Python test suite | `python -m unittest discover -s tests` | `0` | `Ran 24 tests ... OK` |
+| Dart analysis | `dart analyze lib bin` (in `sdk/dart`) | `0` | No issues found |
+| Java compile | `mvn -f sdk/java/pom.xml clean compile` | `0` | Build success |
+| Kotlin compile | `mvn -f sdk/kotlin/pom.xml clean compile` | `0` | Build success |
 
-## Verified Runtime Results
+## Failures Encountered And Fixed
 
-- CLI returned JSON with `status: 200` and valid metadata for `https://example.com`.
-- API endpoints returned `200` with expected shapes:
-  - `/crawl` object with `metadata`.
-  - `/rag_dataset` list of chunks.
-  - `/knowledge_graph` object with `nodes` and `edges`.
-- All SDK examples executed successfully against the local API server and returned JSON payloads.
-- Website production build generated `website/build` successfully.
+1. Java compile failed with BOM character (`illegal character: '\ufeff'`) in rewritten source files.  
+Fix: rewrote edited `.java`/`.kt` files as UTF-8 without BOM.
 
-## Failures Encountered and Fixed
+2. Dart publish dry-run in working tree warned on modified git files and exited non-zero.  
+Fix: validated package in a clean temporary copy of `sdk/dart`; dry-run succeeded with 0 warnings.
 
-1. CLI was importing the globally installed package instead of local source.
-   - Fix: updated `cli/webweavex.py` to prioritize `core/` on `sys.path`.
-2. SDK examples had Unicode/encoding print failures on Windows.
-   - Fix: replaced non-ASCII console markers with ASCII text.
-3. Node SDK failed with `Cannot find module 'axios'`.
-   - Fix: corrected `sdk/node/package.json` (removed self tarball dependency), reinstalled deps.
-4. Dart example failed on `package:http` resolution from root context.
-   - Fix: migrated Dart SDK/client usage to `dart:io` HTTP path and relative SDK import in example.
-5. Java/Kotlin SDKs returned `422` due request-body issue.
-   - Fix: switched both to explicit `HttpURLConnection` JSON POST handling.
-6. Java/Kotlin SDK source layout and Maven execution issues.
-   - Fix: moved Java sources to `src/main/java`, added proper Maven compiler configuration, updated Kotlin source layout.
-7. Python package import failed in clean environment due missing dependencies.
-   - Fix: added `install_requires` and `pyproject.toml` build-system metadata.
-8. Website build emitted deprecated config warnings.
-   - Fix: migrated `onBrokenMarkdownLinks` to `markdown.hooks.onBrokenMarkdownLinks`.
+3. SDK quality gaps (timeout/retry/error typing) across languages.  
+Fix: implemented timeout controls, retry/backoff, and structured errors in Python/Node/Dart; typed response models + structured exceptions in Java/Kotlin.
 
-## Final State
+4. Direct `mvn exec:java` from a fully clean Maven target folder failed because classes were not yet compiled.  
+Fix: validated SDK runtime with `compile exec:java` and validated distributable artifacts with `clean install`.
 
-- End-to-end CLI/API/SDK/package/website flows are executable and verified.
-- Temporary and generated artifacts are cleaned from the working tree before commit.
+## Cleanup Verification
+
+Cleanup completed before finalization:
+
+- removed `__pycache__/`, `node_modules/`, `.dart_tool/`, `build/`, `target/`, `.docusaurus/`
+- removed generated tarballs/log/tmp/bak artifacts
+
+Verification commands:
+
+- `git status`
+- `git ls-files`
+- recursive junk scan for temp/build/cache directories and files
+
+Result: repository contains source/docs/config changes only, with no temporary build artifacts.

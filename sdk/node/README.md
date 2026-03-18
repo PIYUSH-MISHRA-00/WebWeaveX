@@ -10,7 +10,10 @@ npm install webweavex
 const { WebWeaveXClient } = require("webweavex");
 
 async function run() {
-  const client = new WebWeaveXClient("http://127.0.0.1:8001");
+  const client = new WebWeaveXClient("http://127.0.0.1:8001", {
+    timeout: 10_000,
+    maxRetries: 2,
+  });
   const result = await client.crawl("https://example.com");
   console.log(result.status);
 }
@@ -20,14 +23,33 @@ run();
 
 ## Usage Examples
 ```js
-const client = new WebWeaveXClient("http://127.0.0.1:8001");
+const { WebWeaveXClient } = require("webweavex");
+
+const client = new WebWeaveXClient("http://127.0.0.1:8001", {
+  timeout: 8_000,
+  maxRetries: 3,
+  backoffMs: 400,
+});
+
 const page = await client.crawl("https://example.com");
 const dataset = await client.ragDataset("https://example.com");
 const graph = await client.knowledgeGraph("https://example.com");
 ```
 
 ## API Reference
-`new WebWeaveXClient(baseUrl)`
+`new WebWeaveXClient(baseUrl, options?)`
+
+Options:
+
+`timeout` (milliseconds, default `10000`)
+
+`maxRetries` (default `2`)
+
+`backoffMs` (default `300`)
+
+`retryStatusCodes` (default `[408, 429, 500, 502, 503, 504]`)
+
+Methods:
 
 `crawl(url)`
 
@@ -36,6 +58,16 @@ const graph = await client.knowledgeGraph("https://example.com");
 `ragDataset(url)`
 
 `knowledgeGraph(url)`
+
+Errors:
+
+`WebWeaveXError`
+
+`WebWeaveXTimeoutError`
+
+`WebWeaveXNetworkError`
+
+`WebWeaveXHTTPError`
 
 ## Example Output
 ```json
@@ -49,7 +81,26 @@ const graph = await client.knowledgeGraph("https://example.com");
 ```
 
 ## Error Handling
-All methods throw `Error` when request transport fails or an HTTP status is non-2xx. Wrap calls in `try/catch` and implement retries for transient failures.
+```js
+const {
+  WebWeaveXClient,
+  WebWeaveXTimeoutError,
+  WebWeaveXHTTPError,
+} = require("webweavex");
+
+const client = new WebWeaveXClient("http://127.0.0.1:8001");
+try {
+  await client.crawl("https://example.com");
+} catch (error) {
+  if (error instanceof WebWeaveXTimeoutError) {
+    console.error("Request timed out after retries");
+  } else if (error instanceof WebWeaveXHTTPError) {
+    console.error(error.statusCode, error.responseBody);
+  }
+}
+```
 
 ## Security Notes
-Use HTTPS API URLs in production, apply outbound request allowlists for crawl targets, and sanitize user-provided URLs before invoking SDK calls.
+- Use HTTPS API URLs in production.
+- Validate crawl targets before passing them into SDK methods.
+- Restrict outbound network permissions for crawler workers.

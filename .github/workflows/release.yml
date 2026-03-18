@@ -38,3 +38,15 @@ jobs:
       - name: Build Dart package
         working-directory: sdk/dart
         run: dart pub get
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: "21"
+          distribution: "temurin"
+
+      - name: Build Java package
+        run: mvn -f sdk/java/pom.xml clean package -DskipTests
+
+      - name: Build Kotlin package
+        run: mvn -f sdk/kotlin/pom.xml clean package -DskipTests
