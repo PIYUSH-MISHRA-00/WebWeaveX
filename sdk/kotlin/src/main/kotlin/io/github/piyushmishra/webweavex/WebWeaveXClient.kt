@@ -1,3 +1,5 @@
+package io.github.piyushmishra.webweavex
+
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import com.google.gson.annotations.SerializedName
@@ -8,6 +10,7 @@ import java.lang.reflect.Type
 import java.net.HttpURLConnection
 import java.net.SocketTimeoutException
 import java.net.URI
+import java.net.URL
 import java.nio.charset.StandardCharsets
 
 class WebWeaveXClient(
@@ -20,9 +23,9 @@ class WebWeaveXClient(
   private val logger: (String) -> Unit = { message -> println(message) },
 ) {
   companion object {
-    private val DEFAULT_RETRY_STATUSES = setOf(408, 429, 500, 502, 503, 504)
-    private val PAGE_LIST_TYPE: Type = object : TypeToken<List<PageResult>>() {}.type
-    private val RAG_LIST_TYPE: Type = object : TypeToken<List<RagRecord>>() {}.type
+    internal val DEFAULT_RETRY_STATUSES = setOf(408, 429, 500, 502, 503, 504)
+    internal val PAGE_LIST_TYPE: Type = object : TypeToken<List<PageResult>>() {}.type
+    internal val RAG_LIST_TYPE: Type = object : TypeToken<List<RagRecord>>() {}.type
   }
 
   private val baseUrl: String = baseUrl.trimEnd('/')

@@ -1,3 +1,5 @@
+package io.github.piyushmishra.webweavex;
+
 public class JavaClientExample {
   public static void main(String[] args) throws WebWeaveXClient.WebWeaveXException {
     WebWeaveXClient client = new WebWeaveXClient("http://127.0.0.1:8001");

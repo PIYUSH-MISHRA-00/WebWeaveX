@@ -25,6 +25,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 
 - Upgraded root README with a stronger product narrative, 10-second demo, comparison table, and simplified onboarding.
 - Improved package metadata quality for Python (`setup.py`), Node (`sdk/node/package.json`), Dart (`sdk/dart/pubspec.yaml`), Java (`sdk/java/pom.xml`), and Kotlin (`sdk/kotlin/pom.xml`).
+- Refined Kotlin SDK package structure (`io.github.piyushmishra.webweavex`) and aligned source files for production.
 - Updated Java and Kotlin SDK examples/tests to use typed models and cleaner output.
 - Normalized SDK API naming by adding cross-style aliases (`snake_case` + `camelCase`) where appropriate.
 

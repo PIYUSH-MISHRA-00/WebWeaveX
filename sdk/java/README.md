@@ -1,96 +1,89 @@
 # WebWeaveX Java SDK
 
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.piyush-mishra-00/webweavex?label=Maven%20Central)](https://central.sonatype.com/artifact/io.github.piyush-mishra-00/webweavex)
+[![License](https://img.shields.io/badge/license-Apache--2.0-green)](../../LICENSE)
+
+Java SDK for [WebWeaveX](https://github.com/PIYUSH-MISHRA-00/WebWeaveX) — typed, production-ready web crawling client.
+
+## Version
+
+`0.1.0` · Java 8+ · Maven Central
+
 ## Installation
+
+### Maven
 ```xml
 <dependency>
-  <groupId>io.webweavex</groupId>
-  <artifactId>webweavex-java</artifactId>
+  <groupId>io.github.piyush-mishra-00</groupId>
+  <artifactId>webweavex</artifactId>
   <version>0.1.0</version>
 </dependency>
 ```
 
-## Quick Start
-```java
-WebWeaveXClient client = new WebWeaveXClient("http://127.0.0.1:8001");
-WebWeaveXClient.PageResult page = client.crawl("https://example.com");
-System.out.println(page.status);
+### Gradle
+```groovy
+implementation 'io.github.piyush-mishra-00:webweavex:0.1.0'
 ```
 
-## Usage Examples
-```java
-WebWeaveXClient client = new WebWeaveXClient(
-    "http://127.0.0.1:8001",
-    8000,   // timeoutMillis
-    3,      // maxRetries
-    400,    // backoffMillis
-    Set.of(408, 429, 500, 502, 503, 504)
-);
+## Quick Start
 
-WebWeaveXClient.PageResult page = client.crawl("https://example.com");
-List<WebWeaveXClient.RagRecord> dataset = client.ragDataset("https://example.com");
-WebWeaveXClient.KnowledgeGraphResponse graph = client.knowledgeGraph("https://example.com");
+```java
+import io.github.piyushmishra.webweavex.WebWeaveXClient;
+import io.github.piyushmishra.webweavex.PageResult;
+import io.github.piyushmishra.webweavex.KnowledgeGraphResponse;
+import java.util.List;
+
+public class Main {
+    public static void main(String[] args) {
+        var client = new WebWeaveXClient("http://localhost:8001");
+
+        // Crawl a single page
+        PageResult page = client.crawl("https://example.com");
+        System.out.println("Status: " + page.getStatus());
+
+        // Crawl entire site
+        List<PageResult> pages = client.crawlSite("https://example.com");
+        System.out.println("Pages: " + pages.size());
+
+        // Knowledge graph
+        KnowledgeGraphResponse kg = client.knowledgeGraph("https://example.com");
+        System.out.println("Nodes: " + kg.getNodes().size());
+    }
+}
 ```
 
 ## API Reference
-`WebWeaveXClient(String baseUrl)`
 
-`WebWeaveXClient(String baseUrl, int timeoutMillis, int maxRetries, int backoffMillis, Set<Integer> retryStatuses)`
+| Method | Endpoint | Return type |
+|---|---|---|
+| `crawl(url)` | `/crawl` | `PageResult` |
+| `crawlSite(url)` | `/crawl_site` | `List<PageResult>` |
+| `ragDataset(url)` | `/rag_dataset` | `List<RagRecord>` |
+| `knowledgeGraph(url)` | `/knowledge_graph` | `KnowledgeGraphResponse` |
 
-`WebWeaveXClient(String baseUrl, int timeoutMillis, int maxRetries, int backoffMillis, Set<Integer> retryStatuses, boolean debug, Consumer<String> logger)`
+### Constructor Options
 
-`PageResult crawl(String url)`
-
-`List<PageResult> crawlSite(String url)`
-
-`List<RagRecord> ragDataset(String url)`
-
-`KnowledgeGraphResponse knowledgeGraph(String url)`
-
-Exceptions:
-
-`WebWeaveXClient.WebWeaveXException`
-
-`WebWeaveXClient.WebWeaveXTimeoutException`
-
-`WebWeaveXClient.WebWeaveXNetworkException`
-
-`WebWeaveXClient.WebWeaveXHTTPException`
-
-## Example Output
-```json
-{
-  "url": "https://example.com",
-  "status": 200,
-  "metadata": {
-    "title": "Example Domain"
-  }
-}
-```
-
-Enable debug logging:
 ```java
-WebWeaveXClient client = new WebWeaveXClient(
-    "http://127.0.0.1:8001",
-    10_000,
-    2,
-    300,
-    Set.of(408, 429, 500, 502, 503, 504),
-    true,
-    System.out::println
+new WebWeaveXClient(
+    "http://localhost:8001",  // baseUrl
+    10_000,                   // timeoutMillis
+    2,                        // maxRetries
+    300L,                     // backoffMillis
+    Set.of(429,500,502,503),  // retryStatusCodes
+    false,                    // debug
+    System.out::println       // logger
 );
 ```
 
-## Error Handling
-```java
-try {
-  client.crawl("https://example.com");
-} catch (WebWeaveXClient.WebWeaveXHTTPException error) {
-  System.out.println(error.getStatusCode());
-  System.out.println(error.getResponseBody());
-}
-```
+## Error Types
 
-## Security Notes
-- Use HTTPS endpoints in production.
-- Validate crawl targets before submitting requests.
-- Run crawler clients and workers with restricted network access policies.
+| Exception | Cause |
+|---|---|
+| `WebWeaveXException` | Base SDK exception |
+| `WebWeaveXTimeoutException` | Request timed out |
+| `WebWeaveXNetworkException` | Network/connection failure |
+| `WebWeaveXHttpException` | Non-2xx HTTP response |
+
+## License
+
+Apache-2.0

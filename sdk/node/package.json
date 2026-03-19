@@ -1,11 +1,12 @@
 {
   "name": "webweavex",
   "version": "0.1.0",
-  "description": "AI-native web crawling platform",
+  "description": "AI-native web crawling SDK — typed client for crawl, RAG dataset, and knowledge graph APIs",
   "main": "index.js",
   "exports": "./index.js",
   "type": "commonjs",
   "license": "Apache-2.0",
+  "author": "Piyush Mishra <piyushmishra.professional@gmail.com>",
   "homepage": "https://piyush-mishra-00.github.io/WebWeaveX/",
   "repository": {
     "type": "git",
@@ -33,11 +34,10 @@
     "node": ">=18"
   },
   "dependencies": {
-    "axios": "^1.13.6",
-    "webweavex": "^0.1.0"
+    "axios": "^1.6.8"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": ""
+    "test": "node -e \"const {WebWeaveXClient}=require('.');console.log('WebWeaveXClient loaded:', typeof WebWeaveXClient);\"",
+    "lint": "echo 'No linter configured'"
+  }
 }

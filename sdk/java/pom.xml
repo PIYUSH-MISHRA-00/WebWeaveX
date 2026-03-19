@@ -3,30 +3,40 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>io.webweavex</groupId>
-  <artifactId>webweavex-java</artifactId>
+  <groupId>io.github.piyush-mishra-00</groupId>
+  <artifactId>webweavex</artifactId>
   <version>0.1.0</version>
+  <packaging>jar</packaging>
   <name>WebWeaveX Java SDK</name>
   <description>Typed Java SDK for WebWeaveX crawl, RAG dataset, and knowledge graph APIs.</description>
   <url>https://github.com/PIYUSH-MISHRA-00/WebWeaveX</url>
 
   <licenses>
     <license>
-      <name>Apache-2.0</name>
-      <url>https://www.apache.org/licenses/LICENSE-2.0</url>
-      <distribution>repo</distribution>
+      <name>Apache License, Version 2.0</name>
+      <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
     </license>
   </licenses>
+
+  <developers>
+    <developer>
+      <id>piyush-mishra-00</id>
+      <name>Piyush Mishra</name>
+      <email>piyushmishra.professional@gmail.com</email>
+      <url>https://github.com/PIYUSH-MISHRA-00</url>
+    </developer>
+  </developers>
 
   <scm>
     <connection>scm:git:https://github.com/PIYUSH-MISHRA-00/WebWeaveX.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/PIYUSH-MISHRA-00/WebWeaveX.git</developerConnection>
     <url>https://github.com/PIYUSH-MISHRA-00/WebWeaveX</url>
+    <tag>main</tag>
   </scm>
 
   <properties>
-    <maven.compiler.release>11</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.release>8</maven.compiler.release>
   </properties>
 
   <dependencies>
@@ -38,20 +48,88 @@
   </dependencies>
 
   <build>
-    <sourceDirectory>src/main/java</sourceDirectory>
-    <testSourceDirectory>src/test/java</testSourceDirectory>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.13.0</version>
+        <version>3.14.1</version>
+        <configuration>
+          <release>${maven.compiler.release}</release>
+          <compilerArgs>
+            <arg>-Xlint:-options</arg>
+          </compilerArgs>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>3.4.0</version>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar-no-fork</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>3.12.0</version>
+        <configuration>
+          <source>${maven.compiler.release}</source>
+          <doclint>none</doclint>
+          <encoding>${project.build.sourceEncoding}</encoding>
+          <charset>${project.build.sourceEncoding}</charset>
+        </configuration>
+        <executions>
+          <execution>
+            <id>attach-javadocs</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-gpg-plugin</artifactId>
+        <version>3.2.8</version>
+        <executions>
+          <execution>
+            <id>sign-artifacts</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>sign</goal>
+            </goals>
+            <configuration>
+              <gpgArguments>
+                <arg>--pinentry-mode</arg>
+                <arg>loopback</arg>
+              </gpgArguments>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.sonatype.central</groupId>
+        <artifactId>central-publishing-maven-plugin</artifactId>
+        <version>0.10.0</version>
+        <extensions>true</extensions>
+        <configuration>
+          <publishingServerId>central</publishingServerId>
+          <autoPublish>true</autoPublish>
+          <waitUntil>published</waitUntil>
+          <waitMaxTime>3600</waitMaxTime>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
-        <version>3.1.0</version>
+        <version>3.6.1</version>
         <configuration>
-          <mainClass>JavaClientExample</mainClass>
+          <mainClass>io.github.piyushmishra.webweavex.JavaClientExample</mainClass>
         </configuration>
       </plugin>
     </plugins>

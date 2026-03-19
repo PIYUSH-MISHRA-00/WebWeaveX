@@ -1,22 +1,31 @@
+package io.github.piyushmishra.webweavex;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 
 public class WebWeaveXClient {
-  private static final Set<Integer> DEFAULT_RETRY_STATUSES = Set.of(408, 429, 500, 502, 503, 504);
+  private static final Set<Integer> DEFAULT_RETRY_STATUSES = Collections.unmodifiableSet(
+      new HashSet<Integer>(Arrays.asList(408, 429, 500, 502, 503, 504))
+  );
   private static final Type PAGE_LIST_TYPE = new TypeToken<List<PageResult>>() {}.getType();
   private static final Type RAG_LIST_TYPE = new TypeToken<List<RagRecord>>() {}.getType();
 
@@ -57,7 +66,9 @@ public class WebWeaveXClient {
     this.timeoutMillis = Math.max(1, timeoutMillis);
     this.maxRetries = Math.max(0, maxRetries);
     this.backoffMillis = Math.max(0, backoffMillis);
-    this.retryStatuses = retryStatuses == null ? DEFAULT_RETRY_STATUSES : retryStatuses;
+    this.retryStatuses = retryStatuses == null
+        ? DEFAULT_RETRY_STATUSES
+        : Collections.unmodifiableSet(new HashSet<Integer>(retryStatuses));
     this.debug = debug;
     this.logger = logger == null ? System.out::println : logger;
   }
@@ -79,7 +90,9 @@ public class WebWeaveXClient {
   }
 
   private <T> T post(String path, String targetUrl, Type responseType) throws WebWeaveXException {
-    String payload = gson.toJson(Map.of("url", targetUrl));
+    Map<String, String> requestPayload = new HashMap<String, String>();
+    requestPayload.put("url", targetUrl);
+    String payload = gson.toJson(requestPayload);
     WebWeaveXException lastError = null;
 
     for (int attempt = 0; attempt <= maxRetries; attempt++) {
@@ -97,7 +110,7 @@ public class WebWeaveXClient {
 
         byte[] bytes = payload.getBytes(StandardCharsets.UTF_8);
         connection.setFixedLengthStreamingMode(bytes.length);
-        try (var output = connection.getOutputStream()) {
+        try (OutputStream output = connection.getOutputStream()) {
           output.write(bytes);
         }
 
@@ -174,8 +187,13 @@ public class WebWeaveXClient {
     if (stream == null) {
       return "";
     }
-    try (stream) {
-      return new String(stream.readAllBytes(), StandardCharsets.UTF_8);
+    try (InputStream input = stream; ByteArrayOutputStream buffer = new ByteArrayOutputStream()) {
+      byte[] chunk = new byte[4096];
+      int read;
+      while ((read = input.read(chunk)) != -1) {
+        buffer.write(chunk, 0, read);
+      }
+      return new String(buffer.toByteArray(), StandardCharsets.UTF_8);
     }
   }
 

@@ -1,94 +1,72 @@
 # WebWeaveX Python SDK
 
+[![PyPI](https://img.shields.io/pypi/v/webweavex?label=PyPI)](https://pypi.org/project/webweavex/)
+[![License](https://img.shields.io/badge/license-Apache--2.0-green)](../../LICENSE)
+
+Python SDK for [WebWeaveX](https://github.com/PIYUSH-MISHRA-00/WebWeaveX) — production-ready web crawling client with retry and backoff.
+
+## Version
+
+`0.1.0` · Python 3.9+ · PyPI
+
 ## Installation
+
 ```bash
 pip install webweavex
 ```
 
 ## Quick Start
+
 ```python
-from sdk.python.webweavex_client import WebWeaveXClient
+from webweavex_client import WebWeaveXClient
 
-with WebWeaveXClient("http://127.0.0.1:8001", timeout=10.0, max_retries=2) as client:
-  page = client.crawl("https://example.com")
-  print(page["status"])
-```
+# Context manager — auto-closes session
+with WebWeaveXClient("http://localhost:8001") as client:
+    # Crawl a single page
+    page = client.crawl("https://example.com")
+    print(page["status"])           # 200
+    print(page["metadata"]["title"])
 
-## Usage Examples
-```python
-from sdk.python.webweavex_client import WebWeaveXClient
+    # Generate RAG dataset
+    records = client.rag_dataset("https://example.com")
+    print(len(records), "chunks")
 
-client = WebWeaveXClient(
-  "http://127.0.0.1:8001",
-  timeout=8.0,
-  max_retries=3,
-  backoff_seconds=0.4,
-)
-
-page = client.crawl("https://example.com")
-dataset = client.rag_dataset("https://example.com")
-graph = client.knowledge_graph("https://example.com")
-
-client.close()
+    # Extract knowledge graph
+    kg = client.knowledge_graph("https://example.com")
+    print(len(kg["nodes"]), "nodes")
 ```
 
 ## API Reference
-`WebWeaveXClient(base_url: str, timeout: float = 10.0, max_retries: int = 2, backoff_seconds: float = 0.3, retry_statuses: set[int] | None = None, debug: bool = False, logger: Callable[[str], None] | None = None)`
 
-`crawl(url: str) -> dict[str, Any]`
+| Method | Endpoint | Returns |
+|---|---|---|
+| `crawl(url)` | `/crawl` | `dict` |
+| `crawl_site(url)` | `/crawl_site` | `list[dict]` |
+| `rag_dataset(url)` | `/rag_dataset` | `list[dict]` |
+| `knowledge_graph(url)` | `/knowledge_graph` | `dict` |
 
-`crawl_site(url: str) -> list[dict[str, Any]]`
+### Constructor Options
 
-`crawlSite(url: str) -> list[dict[str, Any]]`
-
-`rag_dataset(url: str) -> list[dict[str, Any]]`
-
-`ragDataset(url: str) -> list[dict[str, Any]]`
-
-`knowledge_graph(url: str) -> dict[str, list[dict[str, str]]]`
-
-`knowledgeGraph(url: str) -> dict[str, list[dict[str, str]]]`
-
-Errors:
-
-`WebWeaveXError`
-
-`WebWeaveXTimeoutError`
-
-`WebWeaveXNetworkError`
-
-`WebWeaveXHTTPError`
-
-## Example Output
-```json
-{
-  "url": "https://example.com",
-  "status": 200,
-  "metadata": {
-    "title": "Example Domain"
-  }
-}
-```
-
-## Error Handling
 ```python
-from sdk.python.webweavex_client import WebWeaveXClient, WebWeaveXTimeoutError, WebWeaveXHTTPError
-
-client = WebWeaveXClient("http://127.0.0.1:8001", max_retries=2)
-try:
-  client.crawl("https://example.com")
-except WebWeaveXTimeoutError:
-  print("Retry budget exhausted due to timeout")
-except WebWeaveXHTTPError as exc:
-  print(exc.status_code, exc.response_body)
+WebWeaveXClient(
+    base_url="http://localhost:8001",
+    timeout=10.0,         # seconds
+    max_retries=2,
+    backoff_base=0.3,     # seconds
+    retry_status_codes={408, 429, 500, 502, 503, 504},
+    debug=False,
+)
 ```
 
-Enable debug logging:
-```python
-client = WebWeaveXClient("http://127.0.0.1:8001", debug=True)
-```
+## Error Types
 
-## Security Notes
-- Use HTTPS for production API endpoints.
-- Validate and sanitize user-supplied URLs before crawl requests.
-- Apply network egress policies so crawler workers can only reach approved domains.
+| Exception | Cause |
+|---|---|
+| `WebWeaveXError` | Base SDK exception |
+| `WebWeaveXTimeoutError` | Request timed out |
+| `WebWeaveXHTTPError` | Non-2xx HTTP response |
+| `WebWeaveXNetworkError` | Network/connection failure |
+
+## License
+
+Apache-2.0

@@ -1,4 +1,4 @@
-﻿# OS
+# OS
 .DS_Store
 Thumbs.db
 
@@ -30,6 +30,8 @@ build/
 *.jar
 *.war
 *.ear
+# Kotlin SDK credentials — never commit
+sdk/kotlin/gradle.properties
 
 # Maven
 target/

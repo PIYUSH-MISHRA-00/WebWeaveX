@@ -1,121 +1,74 @@
-# WebWeaveX Node SDK
+# WebWeaveX Node.js SDK
+
+[![npm](https://img.shields.io/npm/v/webweavex?label=npm)](https://www.npmjs.com/package/webweavex)
+[![License](https://img.shields.io/badge/license-Apache--2.0-green)](../../LICENSE)
+
+Node.js SDK for [WebWeaveX](https://github.com/PIYUSH-MISHRA-00/WebWeaveX) — async web crawling client with full retry + backoff support.
+
+## Version
+
+`0.1.0` · Node.js 18+ · npm
 
 ## Installation
+
 ```bash
 npm install webweavex
 ```
 
 ## Quick Start
+
 ```js
 const { WebWeaveXClient } = require("webweavex");
 
-async function run() {
-  const client = new WebWeaveXClient("http://127.0.0.1:8001", {
-    timeout: 10_000,
-    maxRetries: 2,
-  });
-  const result = await client.crawl("https://example.com");
-  console.log(result.status);
-}
+const client = new WebWeaveXClient("http://localhost:8001");
 
-run();
-```
-
-## Usage Examples
-```js
-const { WebWeaveXClient } = require("webweavex");
-
-const client = new WebWeaveXClient("http://127.0.0.1:8001", {
-  timeout: 8_000,
-  maxRetries: 3,
-  backoffMs: 400,
-});
-
+// Crawl a single page
 const page = await client.crawl("https://example.com");
-const dataset = await client.ragDataset("https://example.com");
-const graph = await client.knowledgeGraph("https://example.com");
+console.log(page.status);           // 200
+console.log(page.metadata.title);
+
+// Generate RAG dataset
+const records = await client.ragDataset("https://example.com");
+console.log(records.length, "chunks");
+
+// Extract knowledge graph
+const kg = await client.knowledgeGraph("https://example.com");
+console.log(kg.nodes.length, "nodes");
 ```
 
 ## API Reference
-`new WebWeaveXClient(baseUrl, options?)`
 
-Options:
+| Method | Endpoint | Returns |
+|---|---|---|
+| `crawl(url)` | `/crawl` | `Promise<object>` |
+| `crawlSite(url)` | `/crawl_site` | `Promise<object[]>` |
+| `ragDataset(url)` | `/rag_dataset` | `Promise<object[]>` |
+| `knowledgeGraph(url)` | `/knowledge_graph` | `Promise<object>` |
 
-`timeout` (milliseconds, default `10000`)
+> **Note:** snake_case aliases (`crawl_site`, `rag_dataset`, `knowledge_graph`) are also available.
 
-`maxRetries` (default `2`)
+### Constructor Options
 
-`backoffMs` (default `300`)
-
-`retryStatusCodes` (default `[408, 429, 500, 502, 503, 504]`)
-
-`debug` (default `false`)
-
-`logger` (custom log function)
-
-Methods:
-
-`crawl(url)`
-
-`crawlSite(url)`
-
-`crawl_site(url)` (alias)
-
-`ragDataset(url)`
-
-`rag_dataset(url)` (alias)
-
-`knowledgeGraph(url)`
-
-`knowledge_graph(url)` (alias)
-
-Errors:
-
-`WebWeaveXError`
-
-`WebWeaveXTimeoutError`
-
-`WebWeaveXNetworkError`
-
-`WebWeaveXHTTPError`
-
-## Example Output
-```json
-{
-  "url": "https://example.com",
-  "status": 200,
-  "metadata": {
-    "title": "Example Domain"
-  }
-}
-```
-
-## Error Handling
 ```js
-const {
-  WebWeaveXClient,
-  WebWeaveXTimeoutError,
-  WebWeaveXHTTPError,
-} = require("webweavex");
-
-const client = new WebWeaveXClient("http://127.0.0.1:8001");
-try {
-  await client.crawl("https://example.com");
-} catch (error) {
-  if (error instanceof WebWeaveXTimeoutError) {
-    console.error("Request timed out after retries");
-  } else if (error instanceof WebWeaveXHTTPError) {
-    console.error(error.statusCode, error.responseBody);
-  }
-}
+new WebWeaveXClient("http://localhost:8001", {
+  timeout: 10_000,          // ms
+  maxRetries: 2,
+  backoffMs: 300,
+  retryStatusCodes: [408, 429, 500, 502, 503, 504],
+  debug: false,
+  logger: null,             // custom (msg) => void logger
+})
 ```
 
-Enable debug logging:
-```js
-const client = new WebWeaveXClient("http://127.0.0.1:8001", { debug: true });
-```
+## Error Types
 
-## Security Notes
-- Use HTTPS API URLs in production.
-- Validate crawl targets before passing them into SDK methods.
-- Restrict outbound network permissions for crawler workers.
+| Class | Cause |
+|---|---|
+| `WebWeaveXError` | Base SDK error |
+| `WebWeaveXTimeoutError` | Request timed out |
+| `WebWeaveXHTTPError` | Non-2xx HTTP response (`.statusCode`, `.responseBody`) |
+| `WebWeaveXNetworkError` | Network/connection failure |
+
+## License
+
+Apache-2.0
